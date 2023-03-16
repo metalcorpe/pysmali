@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+/smali/shell/
 
 # C extensions
 *.so
