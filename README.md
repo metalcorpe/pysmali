@@ -1,10 +1,11 @@
 # PySmali
 
-![LastEdit](https://img.shields.io:/static/v1?label=LastEdit&message=03/15/2023&color=9cf)
-![Status](https://img.shields.io:/static/v1?label=Status&message=DRAFT&color=yellow)
+[![python](https://img.shields.io/badge/python-3.8+-blue.svg?logo=python&labelColor=lightgrey)](https://www.python.org/downloads/)
+![LastEdit](https://img.shields.io:/static/v1?label=LastEdit&message=03/18/2023&color=9cf)
+![Status](https://img.shields.io:/static/v1?label=Status&message=Pre-Release&color=lightgreen)
 ![Platform](https://img.shields.io:/static/v1?label=Platforms&message=Linux|Windows&color=yellowgreen)
 [![Documentation Status](https://readthedocs.org/projects/pysmali/badge/?version=latest)](https://pysmali.readthedocs.io/en/latest/?badge=latest)
-![PyPi](https://img.shields.io:/static/v1?label=PyPi&message=0.1.0&color=green)
+![PyPi](https://img.shields.io:/static/v1?label=PyPi&message=0.1.0&color=lightblue)
 
 
 The main functionalities of this repository cover creating and parsing Smali files with Python3 as well as interpret Smali source code files. There is also an interace interpreter provided that
