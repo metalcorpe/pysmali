@@ -200,6 +200,7 @@ class Line:
 
         self._it = None
         self._head = self._default
+        self._elements = []
         self.reset(line)
 
     def _get_next(self) -> str:
@@ -239,7 +240,8 @@ class Line:
             self.eol_comment = eol_match.group(0).lstrip('# ')
             self.cleaned = self.cleaned[:start] + self.cleaned[end:]
 
-        self._it = iter(self.cleaned.split(' '))
+        self._elements = Line.split_line(self.cleaned)
+        self._it = iter(self._elements)
         self._head = self._get_next()
 
     def peek(self, default: str = _default) -> str:
@@ -265,7 +267,7 @@ class Line:
         :return: the last element
         :rtype: str
         """
-        return self.cleaned.split(' ')[-1]
+        return self._elements[-1]
 
     def has_eol(self) -> bool:
         """Returns whether this line contains an EOL comment
@@ -288,6 +290,30 @@ class Line:
 
     def __len__(self) -> int:
         return len(self.cleaned)
+
+    @staticmethod
+    def split_line(cleaned: str, sep: str = ' ') -> list:
+        end = cleaned.find(sep)
+        start = 0
+        in_literal = False
+        elements = []
+
+        while end != -1:
+            if end-1 > 0 and cleaned[end-1] == '"':
+                in_literal = False
+                elements.append(cleaned[start:end])
+                start = end+1
+
+            elif cleaned[start] == '"':
+                in_literal = True
+
+            elif not in_literal:
+                elements.append(cleaned[start:end])
+                start = end + 1
+
+            end = cleaned.find(sep, end+1)
+        elements.append(cleaned[start:])
+        return elements
 
 class Type:
     """Basic type definition that can handle both class and method types.
@@ -317,9 +343,16 @@ class Type:
 
         if name.startswith('['):
             idx = name.rfind('[')
-            return name[ :idx] + f"L{name[idx+1:].replace('.', '/')};"
+            prefix = name[ :idx]
+            if not name.endswith(';') and name not in "ZCBSIFVJD":
+                return prefix + f"L{name[idx+1:].replace('.', '/')};"
 
-        return f"L{name.replace('.', '/')};"
+            return prefix + f"{name[idx+1:].replace('.', '/')}"
+
+        name = f"{name.replace('.', '/')}"
+        if name[-1] != ';' and name not in "ZCBSIFVJD":
+            name = f"L{name};"
+        return name
 
     @property
     def type_name(self) -> str:
@@ -330,7 +363,8 @@ class Type:
         """
         if not SmaliValueProxy.RE_TYPE_VALUE.match(self.__signature):
             return self.__signature
-        return self.__signature.lstrip('[')[1:-1].replace('.', '/')
+        name = self.__signature.lstrip('[').replace('.', '/')
+        return name.lstrip('L').rstrip(';')
 
     @property
     def class_name(self) -> str:
@@ -440,8 +474,9 @@ def smali_value(value: str) -> 'SmaliValueProxy':
                 sm_value.actual_value = wrapper(value)
             break
 
+
     # Handling of null values is not implemented yet
-    if not sm_value.actual_value:
+    if sm_value.actual_value is None:
         raise ValueError(f"Could not find any matching primitive type for {value}")
 
     sm_locals = {}
@@ -492,10 +527,10 @@ class SmaliValueProxy:
     RE_LONG_VALUE = re.compile(r"[\-\+]?(0x)?[\dabcdefABCDEF]+l$")
     """Pattern for ``long`` values."""
 
-    RE_CHAR_VALUE = re.compile(r"^'\w*'$")
+    RE_CHAR_VALUE = re.compile(r"^'.*'$")
     """Pattern for ``char`` values."""
 
-    RE_STRING_VALUE = re.compile(r'^"\w*"$')
+    RE_STRING_VALUE = re.compile(r'^".*"$')
     """Pattern for ``String`` values."""
 
     RE_TYPE_VALUE = re.compile(r"\[*((L\S*;$)|([ZCBSIFVJD])$)") # NOQA
@@ -506,7 +541,7 @@ class SmaliValueProxy:
 
     RE_HEX_VALUE = re.compile(r"0x[\dabcdefABCDEF]+")
     """Pattern for integer values."""
-    
+
     TYPE_MAP: list = [
         (RE_SHORT_VALUE, int),
         (RE_LONG_VALUE, int),
@@ -529,7 +564,7 @@ class SmaliValueProxy:
 
     actual_value = None
     """The actual value of any type"""
-    
+
     @staticmethod
     def is_type_descriptor(value: str) -> bool:
         """Returns whether the given value is a valid type descriptor.
@@ -561,22 +596,43 @@ __smali_builtins__ = [
 ]
 
 __smali_specials__ = [
-    ("__iadd__", lambda x,y: x+y),
-    ("__isub__", lambda x,y: x-y),
-    ("__imul__", lambda x,y: x*y),
-    ("__itruediv__", lambda x,y: x/y),
-    ("__ifloordiv__", lambda x,y: x//y),
-    ("__imod__", lambda x,y: x%y),
-    ("__ilshift__", lambda x,y: x<<y),
-    ("__irshift__", lambda x,y: x>>y),
-    ("__iand__", lambda x,y: x&y),
-    ("__ixor__", lambda x,y: x^y),
-    ("__ior__", lambda x,y: x|y)
+    ("__iadd__", lambda x,y: x.actual_value+y.actual_value),
+    ("__isub__", lambda x,y: x.actual_value-y.actual_value),
+    ("__imul__", lambda x,y: x.actual_value*y.actual_value),
+    ("__itruediv__", lambda x,y: x.actual_value/y.actual_value),
+    ("__ifloordiv__", lambda x,y: x.actual_value//y.actual_value),
+    ("__imod__", lambda x,y: x.actual_value%y.actual_value),
+    ("__ilshift__", lambda x,y: x.actual_value<<y.actual_value),
+    ("__irshift__", lambda x,y: x.actual_value>>y.actual_value),
+    ("__iand__", lambda x,y: x.actual_value&y.actual_value),
+    ("__ixor__", lambda x,y: x.actual_value^y.actual_value),
+    ("__ior__", lambda x,y: x.actual_value|y.actual_value)
 ]
+
+def __wrap_args__(self, target: str, *args):
+    """Tries to wrap ``SmalivalueProxy`` objects before calling the special method.
+
+    :param target: the method to call
+    :type target: str
+    """
+    if len(args) == 0:
+        return self.__dict__[target](*args)
+
+    new_args = []
+    for val in args:
+        # Built-in types will throw errors when using executing
+        # SmaliValueProxy * SmaliValueProxy, so we have to convert
+        # the proxy argument by using the actual value
+        if isinstance(val, SmaliValueProxy):
+            new_args.append(val.actual_value)
+        else:
+            new_args.append(val)
+
+    return self.__dict__[target](*new_args)
 
 for method in __smali_builtins__:
     setattr(SmaliValueProxy, method,
-        lambda self, *args, method=method: self.__dict__[method](*args)
+        lambda self, *args, method=method: __wrap_args__(self, method, *args)
     )
 
 def __wrap_special__(instance, actual_val, val, funct):

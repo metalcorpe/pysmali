@@ -4,10 +4,11 @@
 ![Status](https://img.shields.io:/static/v1?label=Status&message=DRAFT&color=yellow)
 ![Platform](https://img.shields.io:/static/v1?label=Platforms&message=Linux|Windows&color=yellowgreen)
 [![Documentation Status](https://readthedocs.org/projects/pysmali/badge/?version=latest)](https://pysmali.readthedocs.io/en/latest/?badge=latest)
-![PyPi](https://img.shields.io:/static/v1?label=PyPi&message=0.0.1&color=green)
+![PyPi](https://img.shields.io:/static/v1?label=PyPi&message=0.1.0&color=green)
 
 
-The main functionalities of this repository cover creating and parsing Smali files with Python3 as well as interpret Smali source code files.
+The main functionalities of this repository cover creating and parsing Smali files with Python3 as well as interpret Smali source code files. There is also an interace interpreter provided that
+acts as a Python-CLI.
 
 
 ## Installation
@@ -16,11 +17,33 @@ By now, the only way to install the python module in this repository is by cloni
 
 ```bash
 $ cd ./pysmali && pip install .
+# Or with pip
+$ pip install pysmali
 ```
 
 ## Usage
 
 For a more detailed explanation of the Smali Visitor-API use the [docs](https://pysmali.readthedocs.io/).
+
+### ISmali (Interactive Smali Interpreter)
+
+As of version `0.1.0` the interactive interpreter can be used to execute Smali code directly:
+
+```bash
+$ ismali example.ssf
+# or start interactive mode
+$ ismali
+>>> vars
+{'p0': <SmaliObject@195f5c0da90>}
+```
+
+Some notes:
+
+* ``p0``: This register always stores the root-instance where defined fields and methods will be stored.
+* ``vars``: This command can be used to print all registers together with their values
+* `L<Root>;`: The name of the root-context class
+
+The API [documentation](https://pysmali.readthedocs.io/) provides some usage examples and usage hints.
 
 ### Parsing Smali-Files
 
@@ -98,7 +121,7 @@ text = writer.code
 
 ### Importing classes and execute methods
 
-As of version `0.0.1` you can import Smali files and execute defined methods:
+As of version `0.1.0` you can import Smali files and execute defined methods:
 
 ```python
 from smali.bridge import SmaliVM, SmaliObject

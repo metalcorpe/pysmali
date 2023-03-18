@@ -78,7 +78,7 @@ class ClassLoader(metaclass=ABCMeta):
         :param init: whether ``<clinit>`` should be executed, defaults to True
         :type init: bool, optional
         :param lookup_missing: whether missing classes should be searched before parsing
-        can continue, defaults to False
+                               can continue, defaults to False
         :type lookup_missing: bool, optional
         :raises NoSuchClassError: if the given class is not defined and ``lookup_missing`` is true
         :raises InvalidOpcodeError: if the parsed opcode is invalid
@@ -88,12 +88,13 @@ class ClassLoader(metaclass=ABCMeta):
 
 
 class DebugHandler:
+    """Basic adapter class used for debugging purposes"""
 
     def precall(self, vm: 'SmaliVM', method: SmaliMethod, opc: executor.Executor) -> None:
-        pass
+        """Called before an opcode executor is processed"""
 
     def postcall(self, vm: 'SmaliVM', method: SmaliMethod, opc: executor.Executor) -> None:
-        pass
+        """Called after the opcode has been executed"""
 
 
 class SmaliVM:
@@ -339,14 +340,14 @@ class _SourceMethodVisitor(MethodVisitor):
 
     def visit_goto(self, block_name: str) -> None:
         self.frame.opcodes.append((executor.goto, block_name))
-        self.frame.pos += 1
+        self.pos += 1
 
     def visit_array_data(self, length: str, value_list: list) -> None:
         self.frame.array_data[self._last_label] = value_list
 
     def visit_invoke(self, inv_type: str, args: list, owner: str, method: str) -> None:
         self.frame.opcodes.append((executor.invoke, (inv_type, args, owner, method)))
-        self.frame.pos += 1
+        self.pos += 1
 
     def visit_return(self, ret_type: str, args: list) -> None:
         if ret_type:
@@ -358,10 +359,16 @@ class _SourceMethodVisitor(MethodVisitor):
         for _, value in opcode.__dict__.items():
             if value == ins_name:
                 self.frame.opcodes.append((executor.executor(ins_name), args))
-                self.frame.pos += 1
+                self.pos += 1
+                return
 
         raise InvalidOpcodeError(f'Invalid OpCode: {ins_name}')
 
+    def visit_packed_switch(self, value: str, blocks: list) -> None:
+        self.frame.switch_data[self._last_label] = (value, blocks)
+
+    def visit_sparse_switch(self, branches: dict) -> None:
+        self.frame.switch_data[self._last_label] = branches
 
 class _SourceClassVisitor(ClassVisitor):
 

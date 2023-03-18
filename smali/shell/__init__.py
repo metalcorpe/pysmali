@@ -13,20 +13,22 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+__doc__ = """
+Implementation of a "shell"-like interpreter that can be run interactively
+or can execute smali files.
+
+The options the ``smali.shell`` module accept are the following:
+
+file [file ...]                  
+    The Smali-Script files (``.ssf``) to be interpreted. Note that files 
+    as input won't result in interactive mode. Use the ``-i`` flag to run 
+    the interactive mode afterwards.   
+
+-i / --interactive   
+    Runs the interactive mode after executing/importing input files.
+    
 """
-Standard Java wrapper classes that will be registered to a VM
-once it was created.
-"""
 
-Object = {
-    "toString()Ljava/lang/String;": str,
-    "<init>()V": lambda x: x,
-    "hashCode()I": id,
-    "getClass()Ljava/lang/Class;": lambda x: x.smali_class
-}
-
-Class = {
-    "getSimpleName()Ljava/lang/String;": lambda x: x.name
-}
-
+from smali.shell.model import ISmaliShell, SMALI_SCRIPT_SUFFIX
+from smali.shell.cli import start_cli
 

@@ -830,9 +830,8 @@ class SmaliObject:
         if field.modifiers in AccessType.STATIC:
             field.value = value
 
-        if name not in self.__field_values:
-            raise NoSuchFieldError(f'Field not found: {name}')
-
+        # Rather don't use a check whether the field is present
+        # as new members could be defined at runtime
         self.__field_values[name] = value
 
     def __contains__(self, name: str):
@@ -852,3 +851,6 @@ class SmaliObject:
         :meta public:
         """
         return f"<SmaliObject@{id(self):x}>"
+
+    def __str__(self) -> str:
+        return f"<SmaliObject@{id(self):x} fields={len(self.__field_values)} type={self.smali_class}"

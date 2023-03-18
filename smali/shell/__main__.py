@@ -13,20 +13,9 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
-Standard Java wrapper classes that will be registered to a VM
-once it was created.
-"""
+__doc__ = "Main module of smali.shell"
 
-Object = {
-    "toString()Ljava/lang/String;": str,
-    "<init>()V": lambda x: x,
-    "hashCode()I": id,
-    "getClass()Ljava/lang/Class;": lambda x: x.smali_class
-}
+from smali.shell.cli import start_cli
 
-Class = {
-    "getSimpleName()Ljava/lang/String;": lambda x: x.name
-}
-
-
+if __name__ == '__main__':
+    start_cli()

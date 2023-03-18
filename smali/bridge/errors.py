@@ -18,8 +18,8 @@ Common exceptions of the Smali-Python-Bridge
 """
 
 __all__ = [
-    'NoSuchClassError', 'NoSuchMethodError', 'NoSuchFieldError', 
-    'NoSuchRegisterError', 'NoSuchOpcodeError', 'InvalidOpcodeError', 
+    'NoSuchClassError', 'NoSuchMethodError', 'NoSuchFieldError',
+    'NoSuchRegisterError', 'NoSuchOpcodeError', 'InvalidOpcodeError',
     'ExecutionError'
 ]
 
@@ -43,16 +43,16 @@ class InvalidOpcodeError(Exception):
 
 class ExecutionError(Exception):
     """Wrapper class for runtime exceptions."""
-    
+
     name: str
     """The exception class name"""
-    
+
     def __init__(self, name: str, *args: object) -> None:
         super().__init__(*args)
         self.name = name
-    
+
     def __repr__(self) -> str:
-        return f"<{self.name} at {id(self)}" 
-    
+        return f"<{self.name} at {id(self)}"
+
     def __str__(self) -> str:
         return super().__str__().replace('ExecutionError', self.name)

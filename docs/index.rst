@@ -73,6 +73,7 @@ Development
 
    api/smali/bridge
    api/smali/bridge_api
+   api/smali/shell
 
 
 Indices and tables

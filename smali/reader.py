@@ -39,10 +39,10 @@ from smali.opcode import RETURN, GOTO
 
 class SupportsCopy:
     """Interface for classes that can react as a copy handler for a SmaliReader.
-    
+
     Note that the context is used to distinguish the current visitor.
     """
-    
+
     def copy(self, line: str, context: type = ClassVisitor) -> None:
         """Copies the given line.
 
@@ -325,6 +325,9 @@ class SmaliReader:
                 elif isinstance(self._visitor, MethodVisitor):
                     self._handle_instruction()
 
+                else:
+                    raise SyntaxError(f'Invalid statement: "{statement}"')
+
         except EOFError:
             # The error is needed to indicate the visitation should end
             self._visitor.visit_end()
@@ -503,7 +506,7 @@ class SmaliReader:
         if directive in (Token.LOCAL, Token.PARAM):
             self._copy_line()
             return
-        
+
         visitor = self.stack.pop()
         if visitor and visitor not in (EMPTY_ANNOV, EMPTY_FIELDV, EMPTY_METHV):
             visitor.visit_end()

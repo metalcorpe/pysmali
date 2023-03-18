@@ -121,7 +121,7 @@ class MethodVisitor(VisitorBase):
         definition:
 
         .. code-block:: bnf
-        
+
             .catch <name> { <try_start> .. <try_end> } <catch_handler>
 
         :param exc_name: the exception descriptor
@@ -137,9 +137,9 @@ class MethodVisitor(VisitorBase):
 
         The blocks contain the two enclosing goto blocks and the returning
         definition:
-        
+
         .. code-block:: bnf
-            
+
             .catchall <name> { <try_start> .. <try_end> } <catch_handler>
 
         :param exc_name: the exception descriptor

@@ -81,12 +81,16 @@ class Frame:
     vm = None
     """VM reference"""
 
+    switch_data: dict
+    """Stores packed and sparse-switch data"""
+
     def __init__(self):
         self.registers = {}
         self.opcodes = []
         self.labels = {}
         self.catch = {}
         self.array_data = {}
+        self.switch_data = {}
         self.reset()
 
     def reset(self) -> None:
