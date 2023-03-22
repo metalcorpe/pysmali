@@ -293,6 +293,15 @@ class Line:
 
     @staticmethod
     def split_line(cleaned: str, sep: str = ' ') -> list:
+        """Splits the line by the given delimiter and ignores values in strings
+
+        :param cleaned: the input string
+        :type cleaned: str
+        :param sep: the delimiter, defaults to ' '
+        :type sep: str, optional
+        :return: the splitted values
+        :rtype: list
+        """
         end = cleaned.find(sep)
         start = 0
         in_literal = False

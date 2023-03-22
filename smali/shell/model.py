@@ -188,6 +188,12 @@ class ISmaliShell(Cmd):
 
     prompt: str = '>>> '
     """The prompt used by ``cmd.Cmd``"""
+    
+    check_import: bool = True
+    """Used to indicate whether this shell should verify each import"""
+    
+    __imported_files: list = []
+    """Internal file list"""
 
     def __init__(self) -> None:
         super().__init__()
@@ -209,6 +215,10 @@ class ISmaliShell(Cmd):
         """
         if not os.path.exists(path):
             print(f'! Could not find file at "{path}"')
+            return
+            
+        if path in self.__imported_files and self.check_import:
+            return
 
         if not path.endswith(('.smali', f".{SMALI_SCRIPT_SUFFIX}")):
             print(f"! Unknown file format (unknown suffix) at '{path}'")
@@ -216,12 +226,14 @@ class ISmaliShell(Cmd):
 
         cls = None
         with open(path, 'r', encoding='utf-8') as source:
+            self.__imported_files.append(path)
             if path.endswith(f".{SMALI_SCRIPT_SUFFIX}"):
                 self.visitor.importing = True
                 self.reader.visit(source, self.visitor)
                 self.visitor.importing = False
             else:
                 cls = self.emulator.classloader.load_class(source, init=False)
+            
 
         try:
             if cls is not None:

@@ -6,7 +6,7 @@ Smali VM
 
 .. automodule:: smali.bridge.vm
 
-As of version ``0.1.0`` it is possible to import Smali source code files into 
+As of version ``0.1.1`` it is possible to import Smali source code files into 
 the provided ``SmaliVM``. All classes are stored globally, so there can't be 
 two classes with the same type descriptor. To create a simple Smali emulator,
 just create a new ``SmaliVM`` instance:

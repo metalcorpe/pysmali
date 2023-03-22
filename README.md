@@ -5,7 +5,7 @@
 ![Status](https://img.shields.io:/static/v1?label=Status&message=Pre-Release&color=lightgreen)
 ![Platform](https://img.shields.io:/static/v1?label=Platforms&message=Linux|Windows&color=yellowgreen)
 [![Documentation Status](https://readthedocs.org/projects/pysmali/badge/?version=latest)](https://pysmali.readthedocs.io/en/latest/?badge=latest)
-![PyPi](https://img.shields.io:/static/v1?label=PyPi&message=0.1.0&color=lightblue)
+![PyPi](https://img.shields.io:/static/v1?label=PyPi&message=0.1.1&color=lightblue)
 
 
 The main functionalities of this repository cover creating and parsing Smali files with Python3 as well as interpret Smali source code files. There is also an interace interpreter provided that
@@ -28,7 +28,7 @@ For a more detailed explanation of the Smali Visitor-API use the [docs](https://
 
 ### ISmali (Interactive Smali Interpreter)
 
-As of version `0.1.0` the interactive interpreter can be used to execute Smali code directly:
+As of version `0.1.1` the interactive interpreter can be used to execute Smali code directly:
 
 ```bash
 $ ismali example.ssf
@@ -122,7 +122,7 @@ text = writer.code
 
 ### Importing classes and execute methods
 
-As of version `0.1.0` you can import Smali files and execute defined methods:
+As of version `0.1.1` you can import Smali files and execute defined methods:
 
 ```python
 from smali.bridge import SmaliVM, SmaliObject

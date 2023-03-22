@@ -4,9 +4,9 @@
 Changelog
 *********
 
-.. _release-0.1.0:
+.. _release-0.1.1:
 
-0.1.0
+0.1.1
 =====
 
 * ISmali (interactive Smali shell) pre-release

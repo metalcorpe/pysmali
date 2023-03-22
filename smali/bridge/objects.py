@@ -26,7 +26,7 @@ Object = {
 }
 
 Class = {
-    "getSimpleName()Ljava/lang/String;": lambda x: x.name
+    "getSimpleName()Ljava/lang/String;": lambda x: x.name,
+    "getName()Ljava/lang/String;": lambda x: x.simple_name
 }
-
 

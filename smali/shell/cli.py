@@ -50,4 +50,4 @@ def start_cli():
 
     if len(files) == 0 or args['interactive']:
         shell.cmdloop((f"ISmali {VERSION} on {sys.platform}\nType"
-            "'help' or 'copyright' for more information."))
+            " 'help' or 'copyright' for more information."))

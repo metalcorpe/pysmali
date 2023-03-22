@@ -5,7 +5,7 @@ Smali Shell (ISmali)
 ********************
 
 Introducing a new file format that combines the simplicity of shell scripts with the power of Smali-Code 
-in version :ref:`release-0.1.0` of this project. This new format, which will be called Smali-Script is 
+in version :ref:`release-0.1.1` of this project. This new format, which will be called Smali-Script is 
 defined by the file suffix ``".ssf"``. It is designed to allow users to create and run Smali-Code directly 
 from a single file, using Smali's syntax.
 

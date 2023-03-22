@@ -285,7 +285,9 @@ class SmaliReader:
         i_values = []
         while self.line.has_next():
             value = next(self.line).rstrip(strip_chars)
-            if value[0] != '"' and value[-1] != '"' and ',' in value:
+            # As the Line object splits all values by ' ', strings can
+            # be marked by their '"' at the start or end.
+            if value[0] not in  ('"', "'") and value[-1] not in ('"', "'") and ',' in value:
                 i_values.extend(value.split(','))
             else:
                 i_values.append(value)
@@ -328,7 +330,7 @@ class SmaliReader:
                 else:
                     raise SyntaxError(f'Invalid statement: "{statement}"')
 
-        except EOFError:
+        except (EOFError, ValueError):
             # The error is needed to indicate the visitation should end
             self._visitor.visit_end()
 

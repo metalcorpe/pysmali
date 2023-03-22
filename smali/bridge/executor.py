@@ -8,14 +8,6 @@ from smali.bridge.errors import ExecutionError
 from smali.bridge.lang import SmaliObject
 from smali.bridge.objects import Object, Class
 
-__all__ = [
-    'Executor', 'OpcodeExecutor', 'executor', 'nop', 'return_void',
-    'return_object', 'goto', 'invoke', 'int_to_long', 'int_to_int',
-    'int_to_char', 'int_to_byte', 'int_to_float', 'sput_object',
-    'sget_object', 'rem_int__lit8', 'rem_int', 'const', 'const_class',
-    'move_result', 'move', 'move_exception', 'new_instance'
-]
-
 __executors__ = {}
 """Sepcial dict tat stores all opcodes with their executors"""
 
@@ -27,13 +19,13 @@ class Executor:
     action = None
     """Optional action if this class is not subclassed."""
 
-    frame: Frame = None
+    frame: Frame
     """The current execution frame"""
 
-    args: tuple = None
+    args: tuple
     """THe current execution arguments"""
 
-    kwargs: dict = None
+    kwargs: dict
     """The current execution"""
 
     def __init__(self, action, name=None,
@@ -72,9 +64,9 @@ class Executor:
 
         return value
 
-def OpcodeExecutor(map_to=[]):
+def OpcodeExecutor(map_to: list = None):
     def wrapper(func):
-        return Executor(func, map_to=map_to)
+        return Executor(func, map_to=map_to if map_to else [])
     return wrapper
 
 def executor(name: str) -> Executor:
@@ -259,7 +251,8 @@ def iput_object(self: Executor, src: str, obj: str, info: str):
 
 @OpcodeExecutor(map_to=[
     CONST_STRING, CONST_STRING_JUMBO, CONST_16, CONST_4,
-    CONST_WIDE, CONST_WIDE_HIGH16, CONST_WIDE_32
+    CONST_WIDE, CONST_WIDE_HIGH16, CONST_WIDE_32, 
+    CONST_STRING_JUMBO
 ])
 def const(self: Executor, register: str, value: str):
     self.frame[register] = SmaliValue(value)
@@ -305,6 +298,8 @@ def new_instance(self: Executor, register: str, descriptor: str):
         self.frame[register] = 0
     elif descriptor in ("Ljava/lang/Boolean", "Z"):
         self.frame[register] = False
+    elif descriptor in ('Ljava/util/ArrayList;', 'Ljava/util/LinkedList;'):
+        self.frame[register] = []
     else:
         smali_class = self.frame.vm.get_class(descriptor)
         instance = SmaliObject(smali_class)
@@ -324,6 +319,20 @@ def new_array(self: Executor, dest: str, count_register: str, descriptor: str):
         values = [0.0] * self.frame[count_register]
 
     self.frame[dest] = values
+
+
+@OpcodeExecutor(map_to=[INSTANCE_OF])
+def check_cast(self: Executor, dest: str, descriptor: str):
+    src_class = self.frame[dest]
+    if not isinstance(src_class, SmaliObject):
+        return
+
+    src_class = src_class.smali_class
+    dest_class = self.frame.vm.get_class(descriptor)
+
+    if not src_class.is_assignable(dest_class):
+        raise ExecutionError('ClassCastError', f"Could not cast {dest_class} to {src_class}")
+
 
 ################################################################################
 # SWITCH
@@ -480,6 +489,9 @@ def aput(self: Executor, src: str, array: str, index: str):
 def neg_int(self: Executor, dest: str, src: str):
     self.frame[dest] = -self.frame[src]
 
+@OpcodeExecutor(map_to=[NOT_LONG])
+def not_int(self: Executor, dest: str, src: str):
+    self.frame[dest] = ~self.frame[src]
 
 @OpcodeExecutor(map_to=[OR_LONG_2ADDR])
 def or_int__2addr(self: Executor, dest: str, src: str):

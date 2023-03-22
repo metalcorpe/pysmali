@@ -760,6 +760,17 @@ class SmaliClass(SmaliMember):
         # current class - for static context it is always null
         method(None)
 
+    def is_assignable(self, other: 'SmaliClass') -> bool:
+        if not other or not other.super_cls:
+            return False
+        
+        super_class = other.super_cls
+        while super_class and super_class != 'Ljava/lang/Object;':
+            if super_class == self or super_class == self.super_cls:
+                return True
+        
+        return False
+
 class SmaliObject:
     """Python objects that store data of a Smali object.
 
