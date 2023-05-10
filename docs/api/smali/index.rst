@@ -11,7 +11,7 @@ Smali API
 Overview
 ========
 
-The overall structur of a decompiled Smali class is rather simple. In fact 
+The overall structur of a decompiled Smali class is rather simple. In fact
 a decompiled source class contains:
 
 * A section describing the class' modifiers (such as ``public`` or ``private``), its name, super class and the implemented interfaces.
@@ -33,7 +33,7 @@ of these names are described in the Java ASM documentationin section 2.1.2 [1]_.
 Type descriptors
 ----------------
 
-Type descriptors used in Smali source code are similar to those used in compiled 
+Type descriptors used in Smali source code are similar to those used in compiled
 Java classes. The following list was taken from ASM API [1]_:
 
 .. list-table:: Type descriptors of some Smali types
@@ -45,7 +45,7 @@ Java classes. The following list was taken from ASM API [1]_:
       - Example value
     * - ``void``
       - V
-      - -- 
+      - --
     * - ``boolean``
       - Z
       - ``true`` or ``false``
@@ -78,12 +78,12 @@ Java classes. The following list was taken from ASM API [1]_:
       - --
 
 The descriptors of primitive types can be represented with single characters. Class
-type descriptors always start with a ``L`` and end with a semicolon. In addition to 
-that, array type descriptors will start with opened square brackets according to the 
+type descriptors always start with a ``L`` and end with a semicolon. In addition to
+that, array type descriptors will start with opened square brackets according to the
 number of dimensions. For instance, a two dimensional array would get two opened square
 brackets in its type descriptor.
 
-This API contains a class called ``Type`` that can be used to retrieve type descriptors
+This API contains a class called :class:`Type` that can be used to retrieve type descriptors
 as well as class names:
 
 .. code-block:: python
@@ -106,8 +106,8 @@ Method descriptors
 ------------------
 
 Unlike method descriptors in compiled Java classes, Smali's method descriptors contain the
-method's name. The general structure, described in detail in the ASM API [1]_ documentation, 
-is the same. To get contents of a method descriptor the ``Type`` class, introduced before, 
+method's name. The general structure, described in detail in the ASM API [1]_ documentation,
+is the same. To get contents of a method descriptor the :class:`Type` class, introduced before,
 can be used again:
 
 .. code-block:: python
@@ -124,8 +124,8 @@ can be used again:
     return_type = method.get_method_return_type()
 
 
-.. caution:: 
-    
+.. caution::
+
     The initial method descriptor must be valid as it can cause undefined behaviour
     if custom strings are used.
 
@@ -133,22 +133,22 @@ can be used again:
 Interfaces and components
 =========================
 
-The Smali Visitor-API for generating and transforming Smali-Source files 
-(no bytecode data) is based on the ``ClassVisitor`` class, similar to the 
-ASM API [1]_ in Java. Each method in 
-this class is called whenever the corresponding code structure has been 
+The Smali Visitor-API for generating and transforming Smali-Source files
+(no bytecode data) is based on the :class:`ClassVisitor` class, similar to the
+ASM API [1]_ in Java. Each method in
+this class is called whenever the corresponding code structure has been
 parsed. There are two ways how to visit a code structure:
 
-    1. Simple visit: 
+    1. Simple visit:
         All necessary information are given within the method parameters
 
-    2. Extendend visit: 
-        To deep further into the source code, another visitor instance is 
-        needed (for fields, methods, sub-annotations or annotations and 
+    2. Extendend visit:
+        To deep further into the source code, another visitor instance is
+        needed (for fields, methods, sub-annotations or annotations and
         even inner classes)
-    
-The same rules are applied to all other visitor classes. The base class of 
-all visitors must be ``VisitorBase`` as it contains common methods all sub
+
+The same rules are applied to all other visitor classes. The base class of
+all visitors must be :class:`VisitorBase` as it contains common methods all sub
 classes need:
 
 .. code-block:: python
@@ -161,17 +161,17 @@ classes need:
 
 All visitor classes come with a delegate that can be used together with the
 initial visitor. For instance, we can use our own visitor class together with
-the provided ``SmaliWriter`` that automatically writes the source code.
+the provided :class:`SmaliWriter` that automatically writes the source code.
 
 .. note::
-    The delegate must be an instance of the same class, so ``FieldVisitor`` 
-    objects can't be applied to ``MethodVisitor`` objects as a delegate.
+    The delegate must be an instance of the same class, so :class:`FieldVisitor`
+    objects can't be applied to :class:`MethodVisitor` objects as a delegate.
 
 The provided Smali API provides three core components:
 
-    * The ``SmaliReader`` class is an implementation of a line-based parser that can handle *.smali* files. It can use both utf-8 strings or bytes as an input. It calls the corresponding *visitXXX* methods on the ``ClassVisitor``.
+    * The :class:`SmaliReader` class is an implementation of a line-based parser that can handle *.smali* files. It can use both utf-8 strings or bytes as an input. It calls the corresponding *visitXXX* methods on the :class:`ClassVisitor`.
 
-    * The ``SmaliWriter`` is a subclass of ``ClassVisitor`` that tries to build a Smali file based on the visited statements. It comes together with an ``AnnotationWriter``, ``FieldWriter`` and ``MethodWriter``. It produces an output utf-8 string that can be encoded into bytes.
+    * The :class:`SmaliWriter` is a subclass of :class:`ClassVisitor` that tries to build a Smali file based on the visited statements. It comes together with an ``AnnotationWriter``, ``FieldWriter`` and ``MethodWriter``. It produces an output utf-8 string that can be encoded into bytes.
 
     * The ``XXXVisitor`` classes delegate method calls to internal delegate candicates that must be set with initialisation.
 
@@ -182,7 +182,7 @@ files with these components.
 Parsing classes
 ---------------
 
-The only required component to parse an existing Smali source file is the ``SmaliReader`` 
+The only required component to parse an existing Smali source file is the :class:`SmaliReader`
 component. To illustrate an example usage, assume we want to print out the parsed
 class name, super class and implementing interfaces:
 
@@ -200,11 +200,11 @@ class name, super class and implementing interfaces:
 
         def visit_super(self, super_class: str) -> None:
             print(f".super {super_class}")
-        
+
         def visit_implements(self, interface: str) -> None:
             print(f".implements {interface}")
 
-The second step is to use our previous defined visitor class with a ``SmaliReader``
+The second step is to use our previous defined visitor class with a :class:`SmaliReader`
 component:
 
 .. code-block:: python
@@ -218,14 +218,14 @@ component:
     reader = SmaliReader(comments=False)
     reader.visit(source, printer)
 
-The fifth line creates a ``SmaliReader`` that ignores all comments in the source 
-file to parse. The *visit* method is called at the end to parse the source code 
+The fifth line creates a :class:`SmaliReader` that ignores all comments in the source
+file to parse. The *visit* method is called at the end to parse the source code
 file.
 
 Generating classes
 ------------------
 
-The only required component to generate a new Smali source file is the ``SmaliWriter`` 
+The only required component to generate a new Smali source file is the :class:`SmaliWriter`
 component. For instance, consider the following class:
 
 .. code-block:: smali
@@ -241,7 +241,7 @@ component. For instance, consider the following class:
     .method public abstract run()I
     .end method
 
-It can be generated within seven method calls to a ``SmaliWriter``:
+It can be generated within seven method calls to a :class:`SmaliWriter`:
 
 .. code-block:: python
     :linenos:
@@ -268,12 +268,12 @@ It can be generated within seven method calls to a ``SmaliWriter``:
     writer.visit_end()
     source_code = writer.code
 
-At line 3 a ``SmaliWriter`` is created that will actually build the source code 
-string. 
+At line 3 a :class:`SmaliWriter` is created that will actually build the source code
+string.
 
-The call to ``visit_class`` defines the class header (see line 1 of smali source 
+The call to ``visit_class`` defines the class header (see line 1 of smali source
 code). The first argument represents the class' type descriptor and the second its
-modifiers. To specify additional modifiers, use the ``AccessType`` class. It provides 
+modifiers. To specify additional modifiers, use the :class:`AccessType` class. It provides
 two ways how to retrieve the actual modifiers:
 
 * Either by referencing the enum (like ``AccessType.PUBLIC``)
@@ -284,8 +284,8 @@ two ways how to retrieve the actual modifiers:
         modifiers = AccessType.get_flags(["public", "final"])
 
 The calls to ``visit_super`` defines the super class of our previously defined
-class and to ``visit_implements`` specifies which interfaces are implemented by our 
-class. All arguments must be type descriptors to generate accurate Smali code (see 
+class and to ``visit_implements`` specifies which interfaces are implemented by our
+class. All arguments must be type descriptors to generate accurate Smali code (see
 section :ref:`section-1.1.1` for more information on the type class)
 
 

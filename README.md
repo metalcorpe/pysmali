@@ -5,7 +5,7 @@
 ![Status](https://img.shields.io:/static/v1?label=Status&message=Pre-Release&color=lightgreen)
 ![Platform](https://img.shields.io:/static/v1?label=Platforms&message=Linux|Windows&color=yellowgreen)
 [![Documentation Status](https://readthedocs.org/projects/pysmali/badge/?version=latest)](https://pysmali.readthedocs.io/en/latest/?badge=latest)
-![PyPi](https://img.shields.io:/static/v1?label=PyPi&message=0.1.1&color=lightblue)
+![PyPi](https://img.shields.io:/static/v1?label=PyPi&message=0.1.2&color=lightblue)
 
 
 The main functionalities of this repository cover creating and parsing Smali files with Python3 as well as interpret Smali source code files. There is also an interactive interpreter provided that acts as a Python-CLI.
@@ -27,7 +27,7 @@ For a more detailed explanation of the Smali Visitor-API use the [docs](https://
 
 ### ISmali (Interactive Smali Interpreter)
 
-As of version `0.1.1` the interactive interpreter can be used to execute Smali code directly:
+As of version `0.1.2` the interactive interpreter can be used to execute Smali code directly:
 
 ```bash
 $ ismali example.ssf
@@ -77,7 +77,7 @@ from smali import SmaliReader, ClassVisitor, Type
 
 class NamePrinterVisitor(ClassVisitor):
     def visit_class(self, name: str, access_flags: int) -> None:
-        # The provided name is the type descriptor, so we have to 
+        # The provided name is the type descriptor, so we have to
         # convert it:
         cls_type = Type(name)
         print('ClassName:', cls_type.class_name)
@@ -121,14 +121,14 @@ text = writer.code
 
 ### Importing classes and execute methods
 
-As of version `0.1.1` you can import Smali files and execute defined methods:
+As of version `0.1.2` you can import Smali files and execute defined methods:
 
 ```python
 from smali.bridge import SmaliVM, SmaliObject
 
 with open('example.smali', 'r', encoding='utf-8') as fp:
     source = fp.read()
-    
+
 vm = SmaliVM()
 # Import class definition
 smali_class = vm.classloader.load_class(source, init=False)
@@ -142,7 +142,7 @@ instance.init()
 
 # Execute the method 'toString'
 toString = instance.smali_class.method("toString")
-# The instance must be always the first element (on 
+# The instance must be always the first element (on
 # static methods this argument must be None)
 value = toString(instance)
 print(value)

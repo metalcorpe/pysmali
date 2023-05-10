@@ -6,16 +6,16 @@ Smali Reader API
 
 .. automodule:: smali.reader
 
-The parsing model is rather simple and will be described in the 
+The parsing model is rather simple and will be described in the
 following chapter.
 
-.. note:: 
+.. note::
     Please note that no optimization is done by default, so methods or fields
-    that won't be visited by a ``SmaliWriter`` won't be covered and won't be 
+    that won't be visited by a :class:`SmaliWriter` won't be covered and won't be
     visible in the final file.
-    
-To copy non-visited structures, just add the reader variable to the 
-``SmaliWriter`` when creating a new one:
+
+To copy non-visited structures, just add the reader variable to the
+:class:`SmaliWriter` when creating a new one:
 
 .. code-block:: python
     :linenos:
@@ -27,7 +27,7 @@ To copy non-visited structures, just add the reader variable to the
 
 .. hint::
     You can add your own *copy_handler* to the reader instance if you want
-    to use your own callback to copy raw lines. 
+    to use your own callback to copy raw lines.
 
 
 Parsing model
@@ -41,11 +41,11 @@ Speaking of statements, they can be devided into groups:
 - Token:
 
     Statements begin with a leading ``.`` and can open a new statement block.
-    They are specified in the ``Token`` class described in :ref:`Token-class`
+    They are specified in the :class:`Token` class described in :ref:`Token-class`
 
 - Invocation blocks:
 
-    Block statements used within method declarations start with a ``:`` and 
+    Block statements used within method declarations start with a ``:`` and
     just specify the block's id.
 
 - Annotation values:

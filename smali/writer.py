@@ -473,6 +473,9 @@ class _SmaliClassWriter(ClassVisitor, _ContainsCodeCache):
         if reader:
             reader.copy_handler = self
 
+    def __str__(self) -> str:
+        return self.code
+
     @property
     def code(self) -> str:
         """Returns the source code as an utf-8 string

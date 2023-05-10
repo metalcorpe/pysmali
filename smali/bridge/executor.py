@@ -2,7 +2,7 @@
 import struct
 
 from smali import SmaliValue, Type
-from smali.opcode import *
+from smali.opcode import * # noqa
 from smali.bridge.frame import Frame
 from smali.bridge.errors import ExecutionError
 from smali.bridge.lang import SmaliObject

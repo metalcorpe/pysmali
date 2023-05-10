@@ -4,6 +4,25 @@
 Changelog
 *********
 
+.. _release-0.1.2:
+
+0.1.2
+=====
+
+* :class:`SmaliVM` is now able to use customized executors.
+
+    .. note::
+        The default class loader won't throw any exception upon unknown by default. You
+        can change this behaviour by setting the ``use_strict`` attribute to ``True``:
+
+        .. code-block:: python
+
+            vm = SmaliVM(use_strict=True)
+
+* Code was formatted properly
+* Documentation update
+
+
 .. _release-0.1.1:
 
 0.1.1
@@ -11,7 +30,7 @@ Changelog
 
 * ISmali (interactive Smali shell) pre-release
 * Implementation of almost half of all Smali-opcodes
-* Fixed an error of ``SmaliValueProxy`` that caused exceptions on operations with an object of the same class
+* Fixed an error of :class:`SmaliValueProxy` that caused exceptions on operations with an object of the same class
 * Multiple bug fixes in the process of class definition (import)
 
 .. _release-1.0.0:

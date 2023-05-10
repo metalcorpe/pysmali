@@ -18,7 +18,7 @@ Implementation of a simple Smali emulator named *SmaliVM*. It supports
 execution of small code snippets as well as the execution of whole
 class files.
 
-Debugging can be done by providing a ``DebugHandler`` and enabling the
+Debugging can be done by providing a :class:`DebugHandler` and enabling the
 debug-option wihtin the VM object. It is also possible to use a custom
 ``ClassLoader`` to load or define new classes.
 """
@@ -58,7 +58,7 @@ __all__ = [
 
 
 class ClassLoader(metaclass=ABCMeta):
-    """Abstract base class for SmaliClassLoaders"""
+    """Abstract base class for SmaliClassLoader"""
 
     @abstractmethod
     def define_class(self, source: bytes) -> SmaliClass:
@@ -114,6 +114,9 @@ class SmaliVM:
     executors: dict
     """External executors used to operate on a single opcode."""
 
+    use_strict: bool = False
+    """Tells the VM to throw exceptions on unkown opcodes."""
+
     __classes: dict = {}
     """All classes are stored in a dict
 
@@ -147,10 +150,12 @@ class SmaliVM:
     def __init__(
         self,
         class_loader: ClassLoader = None,
-        executors: dict = executor.cache
+        executors: dict = executor.cache,
+        use_strict: bool = False
     ) -> None:
         self.classloader = _SmaliClassLoader(self) or class_loader
         self.executors = executors or {}
+        self.use_strict = use_strict
 
     def new_class(self, cls: SmaliClass):
         """Defines a new class that can be accessed globally.
@@ -197,13 +202,13 @@ class SmaliVM:
         check to validate all passed arguments. The required registers
         will be filled automatically.
 
-        Debugging is done via the ``DebugHandler`` that must be set globally
+        Debugging is done via the :class:`DebugHandler` that must be set globally
         in this object.
 
         :param method: the method to execute
-        :type method: SmaliMethod
+        :type method: :class:`SmaliMethod`
         :param instance: the smali object
-        :type instance: SmaliObject
+        :type instance: :class:`SmaliObject`
         :raises NoSuchMethodError: if no frame is registered to the given method
         :raises ExecutionError: if an error occurs while execution
         :return: the return value of the executed method
@@ -388,7 +393,7 @@ class _SourceMethodVisitor(MethodVisitor):
             if value == ins_name:
                 # Check if the instruction name is not in the list of executors
                 # in the current frame's virtual machine
-                if ins_name not in cache:
+                if ins_name not in cache and not self.frame.vm.use_strict:
                     # If not, add a tuple of the "nop" opcode function and the
                     # instruction arguments to the frame's opcodes list.
                     func = cache["nop"] if "nop" in cache else executor.nop

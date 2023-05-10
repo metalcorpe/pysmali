@@ -15,7 +15,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 __doc__ = """
 The module ``lang`` of the provided Smali bridge defines classes that
-can be used to mimic Java's reflection at runtime of the ``SmaliVM``.
+can be used to mimic Java's reflection at runtime of the :class:`SmaliVM`.
 
 All members of a Smali class inherit functionalities of ``__eq__``,
 ``__ne__``, as well as hash value calculation and string representation
@@ -24,7 +24,7 @@ of objects.
 .. hint::
 
     Some properties are modifiable like ``SmaliField.value`` or the name
-    of a ``SmaliClass`` object. It is recommended to leave them how they
+    of a :class:`SmaliClass` object. It is recommended to leave them how they
     are and let the VM make chenges to them.
 
 """
@@ -220,7 +220,7 @@ class SmaliAnnotation(SmaliMember):
 
 
 class SmaliField(SmaliMember):
-    """Pypthon class that represents fields in Smali.
+    """Python class that represents fields in Smali.
 
     :param signature: the field's signature (``name:type``)
     :type signature: str
@@ -229,7 +229,7 @@ class SmaliField(SmaliMember):
     :param annotations: the field's annotations, defaults to None
     :type annotations: list, optional
     :param value: the field's value, defaults to None
-    :type value: SmaliValueProxy, optional
+    :type value: :class:`SmaliValueProxy`, optional
     """
 
     __name: str
@@ -260,8 +260,8 @@ class SmaliField(SmaliMember):
     def value(self) -> SmaliValueProxy:
         """Returns the value of this field.
 
-        :return: the value as a ``SmaliValue``
-        :rtype: SmaliValueProxy
+        :return: the value as a :class:`SmaliValue`
+        :rtype: :class:`SmaliValueProxy`
         """
         return self.__value
 
@@ -270,7 +270,7 @@ class SmaliField(SmaliMember):
         """Setter for ``self.value``.
 
         :param new_value: the new value to apply
-        :type new_value: SmaliValueProxy
+        :type new_value: :class:`SmaliValueProxy`
         :raises UnsupportedOperation: if this field can not be modified
         """
         self.__value = new_value
@@ -415,7 +415,7 @@ class _MethodBroker:
     >>> for method in broker:
     ...     print(str(method))
 
-    There is a pre-defined alias for this class named ``SmaliMethodBroker`` in the .
+    There is a pre-defined alias for this class named :class:`SmaliMethodBroker` in the .
     same module.
     """
 
@@ -526,13 +526,13 @@ class SmaliClass(SmaliMember):
 
     Field definitions are stored in a dict to enable quick access to all of
     them. Static fields contain values at class level and the values of normal
-    fields will be stored in separate ``SmaliObject`` instances. A field that
+    fields will be stored in separate :class:`SmaliObject` instances. A field that
     belongs to a class should be retrieved via the following method:
 
     >>> field = smali_class.field("foo")
     <SmaliField 'foo:Ljava/lang/String;'>
 
-    It is also possible to retrieve the ``SmaliField`` via a dict-like access:
+    It is also possible to retrieve the :class:`SmaliField` via a dict-like access:
 
     >>> field = smali_class["foo"]
 
@@ -556,7 +556,7 @@ class SmaliClass(SmaliMember):
 
     In this example we queried the method named ``<init>``, which is the constructor
     method of this class. If there is more than one definition, a so-called
-    ``SmaliMethodBroker`` is returned:
+    :class:`SmaliMethodBroker` is returned:
 
     >>> method = smali_class.method("getString")
     <_MethodBroker of 'getString' at ...>
@@ -565,7 +565,7 @@ class SmaliClass(SmaliMember):
     best method according to the given arguments when trying to execute one
     method.
 
-    Like ``SmaliField`` objects, methods can be added via dic-set as well:
+    Like :class:`SmaliField` objects, methods can be added via dic-set as well:
 
     >>> smali_class["getString"] = SmaliMethod(...)
 
@@ -574,7 +574,7 @@ class SmaliClass(SmaliMember):
 
     The implemented interfaces and super class will be stored as simple string
     objects. As the option ``lookup_missing`` can be set to false, these values
-    won't be initialized with ``SmaliClass`` instances to enable import of
+    won't be initialized with :class:`SmaliClass` instances to enable import of
     whole class files wihtout having all classes defined.
 
     Inner classes defined inside a SmaliClass
@@ -713,7 +713,7 @@ class SmaliClass(SmaliMember):
         :param name: the field's name
         :type name: str
         :raises NoSuchFieldError: if no field with the goven name is defined
-        :return: the ``SmaliField`` instance
+        :return: the :class:`SmaliField` instance
         :rtype: SmaliField
         """
         if name in self.__fields:
@@ -727,7 +727,7 @@ class SmaliClass(SmaliMember):
         :param name: the name (type descrptor)
         :type name: str
         :raises NoSuchClassError: if no inner class with the given name is defined
-        :return: the ``SmaliClass`` instance of the inner class
+        :return: the :class:`SmaliClass` instance of the inner class
         :rtype: SmaliClass
         """
         if name not in self.__classes:

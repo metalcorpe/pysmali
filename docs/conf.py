@@ -15,7 +15,7 @@ author = 'MatrixEditor'
 # The short X.Y version.
 version = '0.1'
 # The full version, including alpha/beta/rc tags.
-release = '0.1.1'
+release = '0.1.2'
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -25,7 +25,7 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 extensions = [
-	'sphinx.ext.autodoc', 
+	'sphinx.ext.autodoc',
 	'sphinx.ext.doctest',
 	'sphinx.ext.todo',
 ]
