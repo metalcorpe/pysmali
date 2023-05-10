@@ -6,10 +6,10 @@
 PySmali's documentation
 =======================
 
-Welcome to the documentation for `pysmali`, a Python3 package designed for parsing, 
+Welcome to the documentation for `pysmali`, a Python3 package designed for parsing,
 transforming and generating Smali source code files, as well as interpreting source
-code files. This documentation is intended to provide an overview of the package's 
-features, installation instructions, and usage examples to help you get started with 
+code files. This documentation is intended to provide an overview of the package's
+features, installation instructions, and usage examples to help you get started with
 using the package in your Python projects.
 
 Using this library
@@ -74,6 +74,7 @@ Development
    api/smali/bridge
    api/smali/bridge_api
    api/smali/shell
+
 
 
 Indices and tables

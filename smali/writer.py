@@ -18,28 +18,18 @@ Contains standard implementations for Smali writers that are able
 to procude classes, method, fields and annotations.
 """
 
-from smali.visitor import (
-    ClassVisitor,
-    MethodVisitor,
-    FieldVisitor,
-    AnnotationVisitor
-)
-from smali.base import (
-    AccessType,
-    Token
-)
+from smali.visitor import ClassVisitor, MethodVisitor, FieldVisitor, AnnotationVisitor
+from smali.base import AccessType, Token
 from smali.reader import SupportsCopy, SmaliReader
 from smali import opcode
 
-__all__ = [
-    'SmaliWriter', 'FieldWriter', 'MethodWriter', 'AnnotationWriter'
-]
+__all__ = ["SmaliWriter", "FieldWriter", "MethodWriter", "AnnotationWriter"]
 
 
 class _ContainsCodeCache(SupportsCopy):
     """Interface to make sure the code cache is returned via a method."""
 
-    def get_cache(self) -> '_CodeCache':
+    def get_cache(self) -> "_CodeCache":
         """Returns the current code cache.
 
         :return: the code cache
@@ -60,6 +50,7 @@ class _ContainsCodeCache(SupportsCopy):
 
             elif isinstance(last_writer, context):
                 last_writer.get_cache().add(line)
+
 
 class _CodeCache:
     """Simple container class for a code cache.
@@ -85,8 +76,9 @@ class _CodeCache:
         """
         return self.__indent
 
-    def add(self, line: str, start: str = "", end: str = "",
-            custom_indent: int = -1) -> None:
+    def add(
+        self, line: str, start: str = "", end: str = "", custom_indent: int = -1
+    ) -> None:
         """Appends the given line of code at the end of this cache.
 
         :param line: the line to add
@@ -96,10 +88,12 @@ class _CodeCache:
         :param end: additional suffix, defaults to ""
         :type end: str, optional
         """
-        indent = self.default_indent * (self.indent if custom_indent == -1 else custom_indent)
+        indent = self.default_indent * (
+            self.indent if custom_indent == -1 else custom_indent
+        )
         self.__code.append(start + indent + line + end)
 
-    def add_to_cache(self, cache: '_ContainsCodeCache') -> None:
+    def add_to_cache(self, cache: "_ContainsCodeCache") -> None:
         """Appends the given code cache to the end of this cache.
 
         :param cache: the cache to append
@@ -115,10 +109,10 @@ class _CodeCache:
         :type comment: str
         """
         line = self.__code[-1]
-        new_line = line[:-1] if line[-1] == '\n' else str(line)
+        new_line = line[:-1] if line[-1] == "\n" else str(line)
         new_line += f" # {comment}"
-        if line[-1] == '\n':
-            new_line += '\n'
+        if line[-1] == "\n":
+            new_line += "\n"
         self.__code[-1] = new_line
 
     def pop_comments(self) -> list:
@@ -141,7 +135,11 @@ class _CodeCache:
         """
         for element in self.__cache:
             cache = element.get_cache()
-            end = '\n' if isinstance(element, (_SmaliFieldWriter, _SmaliMethodWriter)) else ""
+            end = (
+                "\n"
+                if isinstance(element, (_SmaliFieldWriter, _SmaliMethodWriter))
+                else ""
+            )
             if cache:
                 self.add(cache.get_code(clear_cache=clear_caches), end=end)
                 cache.clear()
@@ -157,7 +155,7 @@ class _CodeCache:
         """
         if clear_cache:
             self.apply_code_cache(True)
-        return '\n'.join(self.__code)
+        return "\n".join(self.__code)
 
     def clear(self) -> None:
         """Clears this cache."""
@@ -174,19 +172,21 @@ class _CodeCache:
         if len(self.__cache) > 0:
             return self.__cache[-1]
 
+
 ##########################################################################################
 # ANNOTATION IMPLEMENTATION
 ##########################################################################################
 class _SmaliAnnotationWriter(AnnotationVisitor, _ContainsCodeCache):
     cache: _CodeCache
 
-    def __init__(self, delegate: 'AnnotationVisitor' = None, indent=0,
-                 name=Token.ANNOTATION) -> None:
+    def __init__(
+        self, delegate: "AnnotationVisitor" = None, indent=0, name=Token.ANNOTATION
+    ) -> None:
         super().__init__(delegate)
         self.cache = _CodeCache(indent)
         self._name = name
 
-    def get_cache(self) -> '_CodeCache':
+    def get_cache(self) -> "_CodeCache":
         return self.cache
 
     def visit_value(self, name: str, value) -> None:
@@ -197,14 +197,19 @@ class _SmaliAnnotationWriter(AnnotationVisitor, _ContainsCodeCache):
     def visit_enum(self, name: str, owner: str, const: str, value_type: str) -> None:
         super().visit_enum(name, owner, const, value_type)
         indent = self.cache.indent + 1
-        self.cache.add(f"{name} = .{Token.ENUM} {owner}->{const}:{value_type}",
-                       custom_indent=indent)
+        self.cache.add(
+            f"{name} = .{Token.ENUM} {owner}->{const}:{value_type}",
+            custom_indent=indent,
+        )
 
-    def visit_subannotation(self, name: str, access_flags: int,
-                            signature: str) -> 'AnnotationVisitor':
+    def visit_subannotation(
+        self, name: str, access_flags: int, signature: str
+    ) -> "AnnotationVisitor":
         delegate = super().visit_subannotation(name, access_flags, signature)
         desc = f"{name} = .{Token.SUBANNOTATION} {signature}"
-        a_visitor = _SmaliAnnotationWriter(delegate, self.cache.indent+1, Token.SUBANNOTATION)
+        a_visitor = _SmaliAnnotationWriter(
+            delegate, self.cache.indent + 1, Token.SUBANNOTATION
+        )
 
         a_visitor.cache.add(desc)
         self.cache.add_to_cache(a_visitor)
@@ -215,13 +220,19 @@ class _SmaliAnnotationWriter(AnnotationVisitor, _ContainsCodeCache):
         indent = self.cache.indent
 
         if len(values) == 0:
-            self.cache.add("%s = {}" % name, custom_indent=indent+1) # noqa
+            self.cache.add("%s = {}" % name, custom_indent=indent + 1)  # noqa
         else:
-            sep_value = ',\n' + indent_value*(indent+2)
-            self.cache.add("%s = {\n%s%s\n%s}" % (
-                name, indent_value*(indent+2),
-                sep_value.join(values), indent_value*(indent+1)
-            ), custom_indent=indent+1)
+            sep_value = ",\n" + indent_value * (indent + 2)
+            self.cache.add(
+                "%s = {\n%s%s\n%s}"
+                % (
+                    name,
+                    indent_value * (indent + 2),
+                    sep_value.join(values),
+                    indent_value * (indent + 1),
+                ),
+                custom_indent=indent + 1,
+            )
         return super().visit_array(name, values)
 
     def visit_comment(self, text: str) -> None:
@@ -244,20 +255,20 @@ class _SmaliAnnotationWriter(AnnotationVisitor, _ContainsCodeCache):
 class _SmaliFieldWriter(FieldVisitor, _ContainsCodeCache):
     cache: _CodeCache
 
-    def __init__(self, delegate: 'FieldVisitor' = None, indent=0) -> None:
+    def __init__(self, delegate: "FieldVisitor" = None, indent=0) -> None:
         super().__init__(delegate)
         self.cache = _CodeCache(indent)
 
     def visit_annotation(self, access_flags: int, signature: str) -> AnnotationVisitor:
         delegate = super().visit_annotation(access_flags, signature)
         desc = f".{Token.ANNOTATION} {' '.join(AccessType.get_names(access_flags))} {signature}"
-        a_visitor = _SmaliAnnotationWriter(delegate, self.cache.indent+1)
+        a_visitor = _SmaliAnnotationWriter(delegate, self.cache.indent + 1)
 
         a_visitor.cache.add(desc)
         self.cache.add_to_cache(a_visitor)
         return a_visitor
 
-    def get_cache(self) -> '_CodeCache':
+    def get_cache(self) -> "_CodeCache":
         return self.cache
 
     def visit_comment(self, text: str) -> None:
@@ -273,20 +284,21 @@ class _SmaliFieldWriter(FieldVisitor, _ContainsCodeCache):
         self.cache.apply_code_cache(True)
         self.cache.add(f".{Token.END} {Token.FIELD}")
 
+
 ##########################################################################################
 # METHOD IMPLEMENTATION
 ##########################################################################################
 class _SmaliMethodWriter(MethodVisitor, _ContainsCodeCache):
     cache: _CodeCache
 
-    def __init__(self, delegate: 'MethodVisitor' = None, indent=0) -> None:
+    def __init__(self, delegate: "MethodVisitor" = None, indent=0) -> None:
         super().__init__(delegate)
         self.cache = _CodeCache(indent)
 
     def visit_annotation(self, access_flags: int, signature: str) -> AnnotationVisitor:
         delegate = super().visit_annotation(access_flags, signature)
         desc = f".{Token.ANNOTATION} {' '.join(AccessType.get_names(access_flags))} {signature}"
-        a_visitor = _SmaliAnnotationWriter(delegate, self.cache.indent+1)
+        a_visitor = _SmaliAnnotationWriter(delegate, self.cache.indent + 1)
 
         a_visitor.cache.add(desc)
         self.cache.add_to_cache(a_visitor)
@@ -295,76 +307,96 @@ class _SmaliMethodWriter(MethodVisitor, _ContainsCodeCache):
     def visit_block(self, name: str) -> None:
         self.cache.apply_code_cache(True)
         super().visit_block(name)
-        self.cache.add(f":{name}", custom_indent=self.cache.indent+1)
+        self.cache.add(f":{name}", custom_indent=self.cache.indent + 1)
 
     def visit_line(self, number: int) -> None:
         self.cache.apply_code_cache(True)
         super().visit_line(number)
-        self.cache.add(f".{Token.LINE} {number}", custom_indent=self.cache.indent+1)
+        self.cache.add(f".{Token.LINE} {number}", custom_indent=self.cache.indent + 1)
 
     def visit_goto(self, block_name: str) -> None:
         self.cache.apply_code_cache(True)
         super().visit_goto(block_name)
-        self.cache.add(f"{opcode.GOTO} :{block_name}", custom_indent=self.cache.indent+1)
+        self.cache.add(
+            f"{opcode.GOTO} :{block_name}", custom_indent=self.cache.indent + 1
+        )
 
     def visit_instruction(self, ins_name: str, args: list) -> None:
         self.cache.apply_code_cache(True)
         super().visit_instruction(ins_name, args)
         self.cache.add(
-            f"{ins_name} {', '.join(args)}", custom_indent=self.cache.indent+1, end='\n'
+            f"{ins_name} {', '.join(args)}",
+            custom_indent=self.cache.indent + 1,
+            end="\n",
         )
 
     def visit_param(self, register: str, name: str) -> None:
         self.cache.apply_code_cache(True)
         super().visit_param(register, name)
-        self.cache.add(f'.{Token.PARAM} {register} "{name}"', custom_indent=self.cache.indent+1)
+        self.cache.add(
+            f'.{Token.PARAM} {register} "{name}"', custom_indent=self.cache.indent + 1
+        )
 
     def visit_comment(self, text: str) -> None:
         super().visit_comment(text)
-        self.cache.add(f"# {text}", custom_indent=self.cache.indent+1)
+        self.cache.add(f"# {text}", custom_indent=self.cache.indent + 1)
 
     def visit_restart(self, register: str) -> None:
         self.cache.apply_code_cache(True)
         super().visit_restart(register)
-        self.cache.add(f".{Token.RESTART} {register}", custom_indent=self.cache.indent+1)
+        self.cache.add(
+            f".{Token.RESTART} {register}", custom_indent=self.cache.indent + 1
+        )
 
     def visit_locals(self, local_count: int) -> None:
         self.cache.apply_code_cache(True)
         super().visit_locals(local_count)
-        self.cache.add(f".{Token.LOCALS} {local_count}", custom_indent=self.cache.indent+1)
+        self.cache.add(
+            f".{Token.LOCALS} {local_count}", custom_indent=self.cache.indent + 1
+        )
 
-    def visit_local(self, register: str, name: str, descriptor: str, full_descriptor: str) -> None:
+    def visit_local(
+        self, register: str, name: str, descriptor: str, full_descriptor: str
+    ) -> None:
         self.cache.apply_code_cache(True)
         super().visit_local(register, name, descriptor, full_descriptor)
-        self.cache.add(f'.{Token.LOCAL} {register}, "{name}":{descriptor}, "{full_descriptor}"',
-                       custom_indent=self.cache.indent+1)
+        self.cache.add(
+            f'.{Token.LOCAL} {register}, "{name}":{descriptor}, "{full_descriptor}"',
+            custom_indent=self.cache.indent + 1,
+        )
 
     def visit_prologue(self) -> None:
         self.cache.apply_code_cache(True)
         super().visit_prologue()
-        self.cache.add(f".{Token.PROLOGUE}", custom_indent=self.cache.indent+1)
+        self.cache.add(f".{Token.PROLOGUE}", custom_indent=self.cache.indent + 1)
 
     def visit_catch(self, exc_name: str, blocks: tuple) -> None:
         self.cache.apply_code_cache(True)
         super().visit_catch(exc_name, blocks)
         start, end, catch = blocks
-        self.cache.add(".%s %s { :%s .. :%s } :%s" % (
-            Token.CATCH, exc_name, start, end, catch
-        ), custom_indent=self.cache.indent+1)
+        self.cache.add(
+            ".%s %s { :%s .. :%s } :%s" % (Token.CATCH, exc_name, start, end, catch),
+            custom_indent=self.cache.indent + 1,
+        )
 
     def visit_catchall(self, exc_name: str, blocks: tuple) -> None:
         self.cache.apply_code_cache(True)
         super().visit_catchall(exc_name, blocks)
         start, end, catch = blocks
-        self.cache.add(".%s %s { :%s .. :%s } :%s" % (
-            Token.CATCHALL, exc_name, start, end, catch
-        ), custom_indent=self.cache.indent+1, end='\n')
+        self.cache.add(
+            ".%s %s { :%s .. :%s } :%s" % (Token.CATCHALL, exc_name, start, end, catch),
+            custom_indent=self.cache.indent + 1,
+            end="\n",
+        )
 
     def visit_registers(self, registers: int) -> None:
         self.cache.apply_code_cache(True)
         super().visit_registers(registers)
-        self.cache.add(f".{Token.REGISTERS} {registers}", custom_indent=self.cache.indent+1,
-                       end='\n')
+        self.cache.add(
+            f".{Token.REGISTERS} {registers}",
+            custom_indent=self.cache.indent + 1,
+            end="\n",
+        )
 
     def visit_return(self, ret_type: str, args: list) -> None:
         self.cache.apply_code_cache(True)
@@ -372,38 +404,45 @@ class _SmaliMethodWriter(MethodVisitor, _ContainsCodeCache):
         if ret_type:
             ret_type = f"-{ret_type}"
 
-        self.cache.add(f"return{ret_type} {' '.join(args)}",
-                       custom_indent=self.cache.indent+1)
+        self.cache.add(
+            f"return{ret_type} {' '.join(args)}", custom_indent=self.cache.indent + 1
+        )
 
     def visit_invoke(self, inv_type: str, args: list, owner: str, method: str) -> None:
         self.cache.apply_code_cache(True)
         super().visit_invoke(inv_type, args, owner, method)
-        self.cache.add("invoke-%s { %s }, %s->%s" % (
-            inv_type, ', '.join(args), owner, method
-        ), custom_indent=self.cache.indent+1, end='\n')
+        self.cache.add(
+            "invoke-%s { %s }, %s->%s" % (inv_type, ", ".join(args), owner, method),
+            custom_indent=self.cache.indent + 1,
+            end="\n",
+        )
 
     def visit_array_data(self, length: str, value_list: list) -> None:
         self.cache.apply_code_cache(True)
         super().visit_array_data(length, value_list)
-        indent_value = self.cache.default_indent * (self.cache.indent+2)
-        sep_value = '\n' + indent_value
-        self.cache.add(f".{Token.ARRAYDATA} {length}\n{indent_value}{sep_value.join(value_list)}",
-                       end='\n')
+        indent_value = self.cache.default_indent * (self.cache.indent + 2)
+        sep_value = "\n" + indent_value
+        self.cache.add(
+            f".{Token.ARRAYDATA} {length}\n{indent_value}{sep_value.join(value_list)}",
+            end="\n",
+        )
 
     def visit_packed_switch(self, value: str, blocks: list) -> None:
         self.cache.apply_code_cache(True)
         super().visit_packed_switch(value, blocks)
-        indent_value = self.cache.default_indent * (self.cache.indent+2)
-        sep_value = '\n' + indent_value + ':'
-        self.cache.add(f".{Token.PACKEDSWITCH} {value}\n{indent_value}{sep_value.join(blocks)}",
-                       end='\n')
+        indent_value = self.cache.default_indent * (self.cache.indent + 2)
+        sep_value = "\n" + indent_value + ":"
+        self.cache.add(
+            f".{Token.PACKEDSWITCH} {value}\n{indent_value}{sep_value.join(blocks)}",
+            end="\n",
+        )
 
     def visit_sparse_switch(self, branches: dict) -> None:
         self.cache.apply_code_cache(True)
         super().visit_sparse_switch(branches)
-        indent_value = self.cache.default_indent * (self.cache.indent+2)
-        values = [f"{x} -> :{y}" for x,y in branches.items()]
-        sep_value = '\n' + indent_value
+        indent_value = self.cache.default_indent * (self.cache.indent + 2)
+        values = [f"{x} -> :{y}" for x, y in branches.items()]
+        sep_value = "\n" + indent_value
         self.cache.add(f".{Token.SPARSESWITCH}\n{indent_value}{sep_value.join(values)}")
 
     def visit_eol_comment(self, text: str) -> None:
@@ -415,7 +454,7 @@ class _SmaliMethodWriter(MethodVisitor, _ContainsCodeCache):
         super().visit_end()
         self.cache.add(f".{Token.END} {Token.METHOD}")
 
-    def get_cache(self) -> '_CodeCache':
+    def get_cache(self) -> "_CodeCache":
         return self.cache
 
 
@@ -451,7 +490,7 @@ class _SmaliClassWriter(ClassVisitor, _ContainsCodeCache):
         """
         self.cache.clear()
 
-    def get_cache(self) -> '_CodeCache':
+    def get_cache(self) -> "_CodeCache":
         return self.cache
 
     ######################################################################################
@@ -459,7 +498,7 @@ class _SmaliClassWriter(ClassVisitor, _ContainsCodeCache):
     ######################################################################################
     def visit_class(self, name: str, access_flags: int) -> None:
         super().visit_class(name, access_flags)
-        flags = ' '.join(AccessType.get_names(access_flags))
+        flags = " ".join(AccessType.get_names(access_flags))
         self.cache.add(f".{Token.CLASS} {flags} {name}")
 
     def visit_super(self, super_class: str) -> None:
@@ -474,9 +513,11 @@ class _SmaliClassWriter(ClassVisitor, _ContainsCodeCache):
         super().visit_source(source)
         self.cache.add(f'.{Token.SOURCE} "{source}"\n')
 
-    def visit_field(self, name: str, access_flags: int, field_type: str, value=None) -> FieldVisitor:
+    def visit_field(
+        self, name: str, access_flags: int, field_type: str, value=None
+    ) -> FieldVisitor:
         delegate = super().visit_field(name, access_flags, field_type, value)
-        flags = ' '.join(AccessType.get_names(access_flags))
+        flags = " ".join(AccessType.get_names(access_flags))
         desc = f".{Token.FIELD} {flags} {name}:{field_type}"
         if value:
             # String values come with their '"' characters
@@ -489,7 +530,7 @@ class _SmaliClassWriter(ClassVisitor, _ContainsCodeCache):
 
     def visit_annotation(self, access_flags: int, signature: str) -> AnnotationVisitor:
         delegate = super().visit_annotation(access_flags, signature)
-        flags = ' '.join(AccessType.get_names(access_flags))
+        flags = " ".join(AccessType.get_names(access_flags))
         desc = f".{Token.ANNOTATION} {flags} {signature}"
         a_visitor = _SmaliAnnotationWriter(delegate, self.cache.indent)
 
@@ -507,11 +548,12 @@ class _SmaliClassWriter(ClassVisitor, _ContainsCodeCache):
         self.cache.add_to_cache(c_visitor)
         return c_visitor
 
-    def visit_method(self, name: str, access_flags: int, parameters: list,
-                     return_type: str) -> MethodVisitor:
+    def visit_method(
+        self, name: str, access_flags: int, parameters: list, return_type: str
+    ) -> MethodVisitor:
         delegate = super().visit_method(name, access_flags, parameters, return_type)
-        flags = ' '.join(AccessType.get_names(access_flags))
-        params = ''.join(parameters)
+        flags = " ".join(AccessType.get_names(access_flags))
+        params = "".join(parameters)
         desc = f".{Token.METHOD} {flags} {name}({params}){return_type}"
 
         m_visitor = _SmaliMethodWriter(delegate, self.cache.indent)
@@ -522,7 +564,7 @@ class _SmaliClassWriter(ClassVisitor, _ContainsCodeCache):
     def visit_comment(self, text: str) -> None:
         self.cache.apply_code_cache(True)
         super().visit_comment(text)
-        self.cache.add(f'# {text}')
+        self.cache.add(f"# {text}")
 
     def visit_eol_comment(self, text: str) -> None:
         super().visit_eol_comment(text)
@@ -552,7 +594,8 @@ class _SmaliClassWriter(ClassVisitor, _ContainsCodeCache):
                 last_writer.get_cache().add(line)
 
             else:
-                print('Line excluded:', line, '<context> =', context)
+                print("Line excluded:", line, "<context> =", context)
+
 
 ##########################################################################################
 # EXPORTS

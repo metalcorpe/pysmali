@@ -14,18 +14,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+
 class VisitorBase:
     """Base class for Smali-Class visitor classes.
 
     :param delegate: A delegate visitor, defaults to None
     :type delegate: BaseVisitor subclass, optional
     """
-    def __init__(self, delegate: 'VisitorBase' = None) -> None:
+
+    def __init__(self, delegate: "VisitorBase" = None) -> None:
         self.delegate = delegate
         # does not apply to muliple inheritance
         if delegate and not isinstance(delegate, self.__class__.__base__):
             raise TypeError(
-                f'Invalid Visitor type - expected subclass of {self.__class__}')
+                f"Invalid Visitor type - expected subclass of {self.__class__}"
+            )
 
     def visit_comment(self, text: str) -> None:
         """Visits a comment string.
@@ -79,7 +82,9 @@ class AnnotationVisitor(VisitorBase):
         if self.delegate:
             self.visit_array(name, values)
 
-    def visit_subannotation(self, name: str, access_flags: int, signature: str) -> 'AnnotationVisitor':
+    def visit_subannotation(
+        self, name: str, access_flags: int, signature: str
+    ) -> "AnnotationVisitor":
         """Prepares to visit an internal annotation.
 
         :param name: the annotation value name
@@ -111,7 +116,7 @@ class AnnotationVisitor(VisitorBase):
 class MethodVisitor(VisitorBase):
     """Base class for method visitors."""
 
-    def __init__(self, delegate: 'MethodVisitor' = None) -> None:
+    def __init__(self, delegate: "MethodVisitor" = None) -> None:
         super().__init__(delegate)
 
     def visit_catch(self, exc_name: str, blocks: tuple) -> None:
@@ -288,7 +293,9 @@ class MethodVisitor(VisitorBase):
         if self.delegate:
             self.delegate.visit_array_data(length, value_list)
 
-    def visit_local(self, register: str, name: str, descriptor: str, full_descriptor: str) -> None:
+    def visit_local(
+        self, register: str, name: str, descriptor: str, full_descriptor: str
+    ) -> None:
         """Handles debug information packed into .local statements.
 
         :param register: the variable register
@@ -380,7 +387,9 @@ class ClassVisitor(VisitorBase):
         if self.delegate:
             self.delegate.visit_implements(interface)
 
-    def visit_field(self, name: str, access_flags: int, field_type: str, value=None) -> FieldVisitor:
+    def visit_field(
+        self, name: str, access_flags: int, field_type: str, value=None
+    ) -> FieldVisitor:
         """Called when a global field definition has been parsed.
 
         :param name: the field's name
@@ -395,8 +404,9 @@ class ClassVisitor(VisitorBase):
         if self.delegate:
             return self.delegate.visit_field(name, access_flags, field_type, value)
 
-    def visit_method(self, name: str, access_flags: int, parameters: list,
-                     return_type: str) -> MethodVisitor:
+    def visit_method(
+        self, name: str, access_flags: int, parameters: list, return_type: str
+    ) -> MethodVisitor:
         """Called when a method definition has been parsed.
 
         :param name: the method's name
@@ -411,9 +421,11 @@ class ClassVisitor(VisitorBase):
         :rtype: MethodVisitor
         """
         if self.delegate:
-            return self.delegate.visit_method(name, access_flags, parameters, return_type)
+            return self.delegate.visit_method(
+                name, access_flags, parameters, return_type
+            )
 
-    def visit_inner_class(self, name: str, access_flags: int) -> 'ClassVisitor':
+    def visit_inner_class(self, name: str, access_flags: int) -> "ClassVisitor":
         """Called when the class definition has been parsed.
 
         :param name: the class name (type descriptor, e.g. "Lcom/example/A;")

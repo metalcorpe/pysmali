@@ -26,16 +26,11 @@ from smali.visitor import (
     ClassVisitor,
     FieldVisitor,
     AnnotationVisitor,
-    MethodVisitor
+    MethodVisitor,
 )
-from smali.base import (
-    AccessType,
-    Line,
-    Token,
-    Type,
-    SmaliValueProxy
-)
+from smali.base import AccessType, Line, Token, Type, SmaliValueProxy
 from smali.opcode import RETURN, GOTO
+
 
 class SupportsCopy:
     """Interface for classes that can react as a copy handler for a SmaliReader.
@@ -50,9 +45,11 @@ class SupportsCopy:
         :type line: str
         """
 
+
 EMPTY_ANNOV = AnnotationVisitor()
 EMPTY_METHV = MethodVisitor()
 EMPTY_FIELDV = FieldVisitor()
+
 
 class SmaliReader:
     """Basic implementation of a line-base Smali-SourceCode parser.
@@ -93,21 +90,26 @@ class SmaliReader:
     context.
     """
 
-    errors: str = 'strict'
+    errors: str = "strict"
     """Indicates whether this reader should throw errors (values: 'strict', 'ignore')"""
 
     copy_handler: SupportsCopy
 
-    def __init__(self, validate: bool = True, comments: bool = False,
-                 snippet: bool = False, errors: str = 'strict') -> None:
+    def __init__(
+        self,
+        validate: bool = True,
+        comments: bool = False,
+        snippet: bool = False,
+        errors: str = "strict",
+    ) -> None:
         self.validate = validate
         self.comments = comments
         self.snippet = snippet
         self.errors = errors
         self.copy_handler = None
         # check valid values
-        if self.errors not in ('ignore', 'strict'):
-            raise ValueError(f'Invalid error handler: {errors}')
+        if self.errors not in ("ignore", "strict"):
+            raise ValueError(f"Invalid error handler: {errors}")
 
     def visit(self, source: io.IOBase, visitor: ClassVisitor) -> None:
         """Parses the given input which can be any readable source.
@@ -121,7 +123,7 @@ class SmaliReader:
         :raises ValueError: if the source is not readable
         """
         if not visitor or not source:
-            raise ValueError('Invalid source or visitor (nullptr)')
+            raise ValueError("Invalid source or visitor (nullptr)")
 
         # Wrap string and bytes instances automatically.
         if isinstance(source, str):
@@ -136,10 +138,10 @@ class SmaliReader:
             raise TypeError(f"Invalid source type: {source.__class__}")
 
         if not source.readable():
-            raise ValueError('Source object is not readable!')
+            raise ValueError("Source object is not readable!")
 
-        if self.errors not in ('ignore', 'strict'):
-            raise ValueError(f'Invalid error handling type: {self.errors}')
+        if self.errors not in ("ignore", "strict"):
+            raise ValueError(f"Invalid error handling type: {self.errors}")
 
         self.source = source
         self.stack.append(visitor)
@@ -188,7 +190,7 @@ class SmaliReader:
 
             self.line.reset(raw_line)
             # Comments will be returned immediately
-            if raw_line.strip().startswith('#'):
+            if raw_line.strip().startswith("#"):
                 if self._visitor and self.comments:
                     self._visitor.visit_comment(self.line.eol_comment)
                 elif not self._visitor and self.comments:
@@ -215,7 +217,7 @@ class SmaliReader:
         if not self.validate:
             return
 
-        if token[0] != '.':
+        if token[0] != ".":
             raise SyntaxError(f"Expected '.' before token - got '{token[0]}'")
 
         if token[1:] != expected:
@@ -265,7 +267,7 @@ class SmaliReader:
         return flags
 
     def _throw_eol(self, err):
-        if self.errors == 'strict':
+        if self.errors == "strict":
             raise SyntaxError("Unexpected EOL (end of line)") from err
 
     def _collect_values(self, strip_chars=None) -> list:
@@ -287,8 +289,12 @@ class SmaliReader:
             value = next(self.line).rstrip(strip_chars)
             # As the Line object splits all values by ' ', strings can
             # be marked by their '"' at the start or end.
-            if value[0] not in  ('"', "'") and value[-1] not in ('"', "'") and ',' in value:
-                i_values.extend(value.split(','))
+            if (
+                value[0] not in ('"', "'")
+                and value[-1] not in ('"', "'")
+                and "," in value
+            ):
+                i_values.extend(value.split(","))
             else:
                 i_values.append(value)
         return i_values
@@ -315,10 +321,10 @@ class SmaliReader:
 
                 statement = self.line.peek()
                 # Tokens start with a leading dot
-                if statement[0] == '.':
+                if statement[0] == ".":
                     self._handle_token()
                 # The same with blocks and a ':'
-                elif statement[0] == ':':
+                elif statement[0] == ":":
                     self._handle_block()
 
                 elif isinstance(self._visitor, AnnotationVisitor):
@@ -394,7 +400,7 @@ class SmaliReader:
                 # It should be possible to parse small code snippets.
                 if not self.validate:
                     return
-                raise SyntaxError('Expected a class defintion - got EOF') from eof
+                raise SyntaxError("Expected a class defintion - got EOF") from eof
 
         try:
             # If validation is enabled, the '.class' token is verified
@@ -421,9 +427,9 @@ class SmaliReader:
         except StopIteration as err:
             self._throw_eol(err)
 
-###########################################################################################
-# TOKEN IMPLEMENTATION
-###########################################################################################
+    ###########################################################################################
+    # TOKEN IMPLEMENTATION
+    ###########################################################################################
 
     def _handle_super(self) -> None:
         try:
@@ -433,7 +439,9 @@ class SmaliReader:
 
             super_class = self.line.peek()
             if not SmaliValueProxy.is_type_descriptor(super_class):
-                raise SyntaxError(f"Expected super-class type descriptor - got '{super_class}'")
+                raise SyntaxError(
+                    f"Expected super-class type descriptor - got '{super_class}'"
+                )
 
             if self._visitor:
                 # Visit the class afterwards
@@ -455,7 +463,7 @@ class SmaliReader:
             token = next(self.line)
             self._validate_token(token, Token.SOURCE)
 
-            source = self.line.peek().replace('"', '')
+            source = self.line.peek().replace('"', "")
             if self._visitor:
                 self._visitor.visit_source(source)
             else:
@@ -475,11 +483,11 @@ class SmaliReader:
 
             # The structure of a field's name is the following:
             #   - <name>:<descriptor>
-            name, descriptor = next(self.line).split(':')
+            name, descriptor = next(self.line).split(":")
             self._validate_descriptor(descriptor)
 
             # Handle bracket names
-            name = name.rstrip('>').lstrip('<')
+            name = name.rstrip(">").lstrip("<")
 
             # If we have a direct assignment, we should parse the value
             value = None
@@ -487,7 +495,9 @@ class SmaliReader:
                 value = self.line.last()
 
             if self._visitor:
-                f_visitor = self._visitor.visit_field(name, access_flags, descriptor, value)
+                f_visitor = self._visitor.visit_field(
+                    name, access_flags, descriptor, value
+                )
                 self._publish_comment()
             else:
                 f_visitor = EMPTY_FIELDV
@@ -529,8 +539,10 @@ class SmaliReader:
             m_visitor = EMPTY_METHV
             if self._visitor:
                 m_visitor = self._visitor.visit_method(
-                    signature.get_method_name(), access_flags,
-                    signature.get_method_params(), signature.get_method_return_type()
+                    signature.get_method_name(),
+                    access_flags,
+                    signature.get_method_params(),
+                    signature.get_method_return_type(),
                 )
 
             # Add the visitor first before publishing the comment
@@ -577,7 +589,7 @@ class SmaliReader:
         try:
             # As we need the annotation value's name, we have to
             # use the cleaned line buffer in the current line object.
-            name = self.line.cleaned[self.line.cleaned.find(' '):]
+            name = self.line.cleaned[self.line.cleaned.find(" ") :]
             flags = self._read_access_flags()
             access_flags = AccessType.get_flags(flags)
 
@@ -586,7 +598,9 @@ class SmaliReader:
 
             a_visitor = EMPTY_ANNOV
             if self._visitor and self._visitor != EMPTY_ANNOV:
-                a_visitor = self._visitor.visit_subannotation(name, access_flags, descriptor)
+                a_visitor = self._visitor.visit_subannotation(
+                    name, access_flags, descriptor
+                )
 
             self.stack.append(a_visitor)
             self._publish_comment()
@@ -600,19 +614,19 @@ class SmaliReader:
         try:
             # As we need the annotation value's name, we have to
             # use the cleaned line buffer in the current line object.
-            name = self.line.cleaned[self.line.cleaned.find(' '):]
+            name = self.line.cleaned[self.line.cleaned.find(" ") :]
 
             token = next(self.line)
             self._validate_token(token, Token.ENUM)
 
             # UNSAFE
-            descriptor, value = self.line.peek().split('->')
+            descriptor, value = self.line.peek().split("->")
             self._validate_descriptor(descriptor)
 
-            val_name, val_descriptor = value.split(':')
+            val_name, val_descriptor = value.split(":")
             self._validate_descriptor(val_descriptor)
 
-            val_name = val_name.rstrip('>').lstrip('<')
+            val_name = val_name.rstrip(">").lstrip("<")
             if self._visitor and self._visitor != EMPTY_ANNOV:
                 self._visitor.visit_enum(name, descriptor, val_name, val_descriptor)
             else:
@@ -634,9 +648,9 @@ class SmaliReader:
             self._copy_line()
         self._publish_comment()
 
-###########################################################################################
-# ANNOTATION VALUE IMPLEMENTATION
-###########################################################################################
+    ###########################################################################################
+    # ANNOTATION VALUE IMPLEMENTATION
+    ###########################################################################################
 
     def _handle_value(self) -> None:
         val_name = next(self.line)
@@ -645,7 +659,7 @@ class SmaliReader:
 
         statement = self.line.peek()
 
-        if statement[0] == '.':
+        if statement[0] == ".":
             self._handle_token()
 
         # We either have a normal value or an array of values
@@ -655,10 +669,13 @@ class SmaliReader:
             if do_copy:
                 self._copy_line()
 
-            if '{' in cleaned:
-                if '}' in cleaned:
+            if "{" in cleaned:
+                if "}" in cleaned:
                     a_values = [
-                        x.strip() for x in cleaned[cleaned.find('{')+1 : cleaned.find('}')].split(',')
+                        x.strip()
+                        for x in cleaned[
+                            cleaned.find("{") + 1 : cleaned.find("}")
+                        ].split(",")
                     ]
                 else:
                     # Read lines until '}' is at line's end, but publish
@@ -666,8 +683,8 @@ class SmaliReader:
                     self._publish_comment()
                     a_values = []
                     self._next_line()
-                    while self.line.cleaned[-1] != '}' and self.line.cleaned[0] != '}':
-                        value = self.line.peek().rstrip(',')
+                    while self.line.cleaned[-1] != "}" and self.line.cleaned[0] != "}":
+                        value = self.line.peek().rstrip(",")
 
                         # Don't forget to publish a line comment
                         self._publish_comment()
@@ -684,9 +701,9 @@ class SmaliReader:
             elif self._visitor and self._visitor != EMPTY_ANNOV:
                 self._visitor.visit_value(val_name, self.line.peek())
 
-###########################################################################################
-# METHOD SPECIFIC IMPLEMENTATION
-###########################################################################################
+    ###########################################################################################
+    # METHOD SPECIFIC IMPLEMENTATION
+    ###########################################################################################
 
     def _handle_param(self) -> None:
         if not self._visitor or self._visitor == EMPTY_METHV:
@@ -713,22 +730,31 @@ class SmaliReader:
             self._copy_line()
 
     def _handle_line(self) -> None:
-        self._handle_method_int(Token.LINE,
-            self._visitor.visit_line if self._visitor not in (None, EMPTY_METHV) else None
+        self._handle_method_int(
+            Token.LINE,
+            self._visitor.visit_line
+            if self._visitor not in (None, EMPTY_METHV)
+            else None,
         )
 
     def _handle_registers(self) -> None:
-        self._handle_method_int(Token.REGISTERS,
-            self._visitor.visit_registers if self._visitor  not in (None, EMPTY_METHV) else None
+        self._handle_method_int(
+            Token.REGISTERS,
+            self._visitor.visit_registers
+            if self._visitor not in (None, EMPTY_METHV)
+            else None,
         )
 
     def _handle_locals(self) -> None:
-        self._handle_method_int(Token.LOCALS,
-            self._visitor.visit_locals if self._visitor  not in (None, EMPTY_METHV) else None
+        self._handle_method_int(
+            Token.LOCALS,
+            self._visitor.visit_locals
+            if self._visitor not in (None, EMPTY_METHV)
+            else None,
         )
 
     def _handle_block(self) -> None:
-        block_id = self.line.peek().lstrip(':')
+        block_id = self.line.peek().lstrip(":")
         if self._visitor and self._visitor not in (None, EMPTY_METHV):
             self._visitor.visit_block(block_id)
             self._publish_comment()
@@ -748,12 +774,12 @@ class SmaliReader:
 
         # 2. Collect try_start and try_end blocks
         cleaned = self.line.cleaned
-        try_start, _, try_end = (cleaned[cleaned.find('{')+1 : cleaned.find('}')]
-            .strip()
-            .split(' '))
+        try_start, _, try_end = (
+            cleaned[cleaned.find("{") + 1 : cleaned.find("}")].strip().split(" ")
+        )
         catch_block = self.line.last()
 
-        values = (try_start.lstrip(':'), try_end.lstrip(':'), catch_block.lstrip(':'))
+        values = (try_start.lstrip(":"), try_end.lstrip(":"), catch_block.lstrip(":"))
         if is_catchall:
             self._visitor.visit_catchall(descriptor, values)
         else:
@@ -775,34 +801,37 @@ class SmaliReader:
             return
 
         instruction = next(self.line)
-        sub_ins = "" if '-' not in instruction else instruction[instruction.find('-')+1 :]
-        if instruction.startswith('invoke'):
+        sub_ins = (
+            "" if "-" not in instruction else instruction[instruction.find("-") + 1 :]
+        )
+        if instruction.startswith("invoke"):
             # Invoke instructions will be handles separately as they have
             # as special structure
             cleaned = self.line.cleaned
             args = [
-                x.strip() for x in cleaned[cleaned.find('{')+1 : cleaned.find('}')].split(',')
+                x.strip()
+                for x in cleaned[cleaned.find("{") + 1 : cleaned.find("}")].split(",")
             ]
 
             # Maybe replace this with a method call in Line
             method_sig = self.line.last()
 
-            descriptor, signature = method_sig.split('->')
+            descriptor, signature = method_sig.split("->")
             self._validate_descriptor(descriptor)
 
             self._visitor.visit_invoke(sub_ins, args, descriptor, signature)
         elif instruction.startswith(RETURN):
             # Return statements are handled separately to make building
             # Smali files easier
-            i_values = self._collect_values(',')
+            i_values = self._collect_values(",")
             self._visitor.visit_return(sub_ins, i_values)
 
         elif instruction == GOTO:
             # Goto instructions are handled directly
-            block = self.line.peek().lstrip(':')
+            block = self.line.peek().lstrip(":")
             self._visitor.visit_goto(block)
         else:
-            i_values = self._collect_values(',')
+            i_values = self._collect_values(",")
             if self._visitor and self._visitor != EMPTY_METHV:
                 self._visitor.visit_instruction(instruction, i_values)
         # Don't forget the EOL comment
@@ -824,8 +853,8 @@ class SmaliReader:
             self._publish_comment()
             if do_copy:
                 self._copy_line()
-            if next_value[0] == ':':
-                blocks.append(next_value.lstrip(':'))
+            if next_value[0] == ":":
+                blocks.append(next_value.lstrip(":"))
             elif Token.END.value in next_value:
                 # Use this method to prevent looping forever
                 break
@@ -858,7 +887,7 @@ class SmaliReader:
             self._publish_comment()
             if do_copy:
                 self._copy_line()
-            if value[0] == '.' and value[1:] == Token.END.value:
+            if value[0] == "." and value[1:] == Token.END.value:
                 break
             values.append(value)
 
@@ -876,10 +905,12 @@ class SmaliReader:
 
         values = self._collect_values()
         if len(values) != 3 and self.validate:
-            raise SyntaxError(f'Expected 3 values in ".local" statement - got {len(values)}')
+            raise SyntaxError(
+                f'Expected 3 values in ".local" statement - got {len(values)}'
+            )
 
         register = values[0]
-        name, descriptor = values[1].split(':')
+        name, descriptor = values[1].split(":")
         full_desc = values[2]
         self._validate_descriptor(descriptor)
         self._validate_descriptor(full_desc)
@@ -904,10 +935,10 @@ class SmaliReader:
             self._publish_comment()
             if do_copy:
                 self._copy_line()
-            if key[0] == '.' and key[1:] == Token.END.value:
+            if key[0] == "." and key[1:] == Token.END.value:
                 break
             # Add the block id without leading ':'
-            values[key] = self.line.last().lstrip(':')
+            values[key] = self.line.last().lstrip(":")
 
         if self._visitor and self._visitor != EMPTY_METHV:
             self._visitor.visit_sparse_switch(values)

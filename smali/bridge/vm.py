@@ -28,33 +28,34 @@ from abc import ABCMeta, abstractmethod
 from smali import SmaliValue, opcode
 from smali.base import Type, AccessType
 from smali.reader import SmaliReader
-from smali.visitor import (
-    ClassVisitor,
-    MethodVisitor,
-    FieldVisitor,
-    AnnotationVisitor
-)
+from smali.visitor import ClassVisitor, MethodVisitor, FieldVisitor, AnnotationVisitor
 from smali.bridge.lang import (
     SmaliClass,
     SmaliMethod,
     SmaliField,
     SmaliAnnotation,
-    RE_REGISTER
+    RE_REGISTER,
 )
 from smali.bridge.frame import Frame
 from smali.bridge.errors import (
     ExecutionError,
     NoSuchMethodError,
     InvalidOpcodeError,
-    NoSuchClassError
+    NoSuchClassError,
 )
 from smali.bridge import executor
 
 __all__ = [
-    'ClassLoader', 'DebugHandler', 'SmaliVM', 'SmaliVMAnnotationReader',
-    'SmaliVMFieldReader', 'SmaliVMMethodReader', 'SmaliVMClassReader',
-    'SmaliClassLoader'
+    "ClassLoader",
+    "DebugHandler",
+    "SmaliVM",
+    "SmaliVMAnnotationReader",
+    "SmaliVMFieldReader",
+    "SmaliVMMethodReader",
+    "SmaliVMClassReader",
+    "SmaliClassLoader",
 ]
+
 
 class ClassLoader(metaclass=ABCMeta):
     """Abstract base class for SmaliClassLoaders"""
@@ -90,10 +91,14 @@ class ClassLoader(metaclass=ABCMeta):
 class DebugHandler:
     """Basic adapter class used for debugging purposes"""
 
-    def precall(self, vm: 'SmaliVM', method: SmaliMethod, opc: executor.Executor) -> None:
+    def precall(
+        self, vm: "SmaliVM", method: SmaliMethod, opc: executor.Executor
+    ) -> None:
         """Called before an opcode executor is processed"""
 
-    def postcall(self, vm: 'SmaliVM', method: SmaliMethod, opc: executor.Executor) -> None:
+    def postcall(
+        self, vm: "SmaliVM", method: SmaliMethod, opc: executor.Executor
+    ) -> None:
         """Called after the opcode has been executed"""
 
 
@@ -105,6 +110,9 @@ class SmaliVM:
 
     debug_handler: DebugHandler
     """The debug handler to use."""
+
+    executors: dict
+    """External executors used to operate on a single opcode."""
 
     __classes: dict = {}
     """All classes are stored in a dict
@@ -121,15 +129,28 @@ class SmaliVM:
     # This map is used to determine which parameters are applied to the right
     # values.
     __type_map: dict = {
-        int: ("B", "S", "I", "J", "Ljava/lang/Byte;", "Ljava/lang/Short;",
-              "Ljava/lang/Integer;", "Ljava/lang/Long;"),
+        int: (
+            "B",
+            "S",
+            "I",
+            "J",
+            "Ljava/lang/Byte;",
+            "Ljava/lang/Short;",
+            "Ljava/lang/Integer;",
+            "Ljava/lang/Long;",
+        ),
         float: ("F", "D", "Ljava/lang/Double;", "Ljava/lang/Float;"),
         str: ("Ljava/lang/String;", "C", "Ljava/lang/Character;"),
-        bool: ('Z', 'Ljava/lang/Boolean;')
+        bool: ("Z", "Ljava/lang/Boolean;"),
     }
 
-    def __init__(self, class_loader: ClassLoader = None) -> None:
+    def __init__(
+        self,
+        class_loader: ClassLoader = None,
+        executors: dict = executor.cache
+    ) -> None:
         self.classloader = _SmaliClassLoader(self) or class_loader
+        self.executors = executors or {}
 
     def new_class(self, cls: SmaliClass):
         """Defines a new class that can be accessed globally.
@@ -138,7 +159,7 @@ class SmaliVM:
         :type cls: SmaliClass
         """
         if not cls:
-            raise ValueError('SmaliClass object is null!')
+            raise ValueError("SmaliClass object is null!")
 
         self.__classes[cls.signature] = cls
 
@@ -190,7 +211,7 @@ class SmaliVM:
         """
         mhash = hash(method)
         if mhash not in self.__frames:
-            raise NoSuchMethodError(f'Method not registered! {method}')
+            raise NoSuchMethodError(f"Method not registered! {method}")
 
         frame: Frame = self.__frames[mhash]
         frame.reset()
@@ -200,7 +221,9 @@ class SmaliVM:
         if method.modifiers not in AccessType.STATIC:
             if not instance:
                 raise ExecutionError(
-                    'NullPtrError', f"Expected instance of '{instance.smali_class.name}'")
+                    "NullPtrError",
+                    f"Expected instance of '{instance.smali_class.name}'",
+                )
             frame.registers["p0"] = instance
 
         # validate method and set parameter values
@@ -240,9 +263,10 @@ class SmaliVM:
             registers[f"p{i}"] = value
 
         if len(parameters) != len(registers):
-            raise ValueError('Invalid argument count! - expected %s, got %d' % (
-                len(parameters), len(registers)
-            ))
+            raise ValueError(
+                "Invalid argument count! - expected %s, got %d"
+                % (len(parameters), len(registers))
+            )
 
         for param, register in zip(parameters, registers):
             param_type = Type(param)
@@ -250,21 +274,23 @@ class SmaliVM:
             for primitive, ptypes in self.__type_map.items():
                 if param_type.class_name in ptypes:
                     if not isinstance(registers[register], primitive):
-                        raise TypeError('Invalid type for parameter, expected %s - got %s' % (
-                            param, type(registers[register])
-                        ))
+                        raise TypeError(
+                            "Invalid type for parameter, expected %s - got %s"
+                            % (param, type(registers[register]))
+                        )
 
             if param_type.descriptor not in self.__classes:
                 raise NoSuchClassError(f'Class "{param_type.descriptor}" not defined!')
 
         frame.registers.update(registers)
 
+
 ####################################################################################################
 # INTERNAL
 ####################################################################################################
 
-class _SourceAnnotationVisitor(AnnotationVisitor):
 
+class _SourceAnnotationVisitor(AnnotationVisitor):
     annotation: SmaliAnnotation
     """The final annotation"""
 
@@ -276,15 +302,15 @@ class _SourceAnnotationVisitor(AnnotationVisitor):
         self.annotation[name] = SmaliValue(value)
 
     def visit_array(self, name: str, values: list) -> None:
-        self.annotation[name] = [
-            SmaliValue(x) for x in values
-        ]
+        self.annotation[name] = [SmaliValue(x) for x in values]
 
     def visit_enum(self, name: str, owner: str, const: str, value_type: str) -> None:
         # TODO: handle enum values
         return super().visit_enum(name, owner, const, value_type)
 
-    def visit_subannotation(self, name: str, access_flags: int, signature: str) -> 'AnnotationVisitor':
+    def visit_subannotation(
+        self, name: str, access_flags: int, signature: str
+    ) -> "AnnotationVisitor":
         sub = SmaliAnnotation(self.annotation, signature, access_flags)
         self.annotation[name] = sub
         return _SourceAnnotationVisitor(sub)
@@ -335,8 +361,7 @@ class _SourceMethodVisitor(MethodVisitor):
         self.frame.catch[start] = (exc_name, handler)
 
     def visit_catchall(self, exc_name: str, blocks: tuple) -> None:
-        start, _, handler = blocks
-        self.frame.catch[start] = (exc_name, handler)
+        self.visit_catch(exc_name, blocks)
 
     def visit_goto(self, block_name: str) -> None:
         self.frame.opcodes.append((executor.goto, block_name))
@@ -356,13 +381,26 @@ class _SourceMethodVisitor(MethodVisitor):
             self.visit_instruction("return", args)
 
     def visit_instruction(self, ins_name: str, args: list) -> None:
+        cache: dict = self.frame.vm.executors
         for _, value in opcode.__dict__.items():
+             # If the value of an attribute is equal to the given instruction
+             # name,
             if value == ins_name:
-                self.frame.opcodes.append((executor.executor(ins_name), args))
+                # Check if the instruction name is not in the list of executors
+                # in the current frame's virtual machine
+                if ins_name not in cache:
+                    # If not, add a tuple of the "nop" opcode function and the
+                    # instruction arguments to the frame's opcodes list.
+                    func = cache["nop"] if "nop" in cache else executor.nop
+                    self.frame.opcodes.append((func, args))
+                else:
+                    # If yes, add a tuple of the executor function for the instruction
+                    # name and the instruction arguments to the frame's opcodes list.
+                    self.frame.opcodes.append((self.frame.vm.executors[ins_name], args))
                 self.pos += 1
                 return
 
-        raise InvalidOpcodeError(f'Invalid OpCode: {ins_name}')
+        raise InvalidOpcodeError(f"Invalid OpCode: {ins_name}")
 
     def visit_packed_switch(self, value: str, blocks: list) -> None:
         self.frame.switch_data[self._last_label] = (value, blocks)
@@ -370,12 +408,12 @@ class _SourceMethodVisitor(MethodVisitor):
     def visit_sparse_switch(self, branches: dict) -> None:
         self.frame.switch_data[self._last_label] = branches
 
-class _SourceClassVisitor(ClassVisitor):
 
+class _SourceClassVisitor(ClassVisitor):
     smali_class: SmaliClass
     """The result class object"""
 
-    vm : SmaliVM
+    vm: SmaliVM
     """The vm used wihtin method visitor objects"""
 
     def __init__(self, vm: SmaliVM, smali_class: SmaliClass = None) -> None:
@@ -391,18 +429,28 @@ class _SourceClassVisitor(ClassVisitor):
     def visit_class(self, name: str, access_flags: int) -> None:
         self.smali_class = SmaliClass(None, name, access_flags)
 
-    def visit_inner_class(self, name: str, access_flags: int) -> 'ClassVisitor':
+    def visit_inner_class(self, name: str, access_flags: int) -> "ClassVisitor":
         inner = SmaliClass(self.smali_class, name, access_flags)
         self.smali_class[name] = inner
         return _SourceClassVisitor(self.vm, inner)
 
-    def visit_field(self, name: str, access_flags: int, field_type: str, value=None) -> FieldVisitor:
-        field = SmaliField(self.smali_class, f"{name}:{field_type}", access_flags,
-                           name, Type(field_type), value=SmaliValue(value) if value else None)
+    def visit_field(
+        self, name: str, access_flags: int, field_type: str, value=None
+    ) -> FieldVisitor:
+        field = SmaliField(
+            self.smali_class,
+            f"{name}:{field_type}",
+            access_flags,
+            name,
+            Type(field_type),
+            value=SmaliValue(value) if value else None,
+        )
         self.smali_class[name] = field
         return _SourceFieldVisitor(field)
 
-    def visit_method(self, name: str, access_flags: int, parameters: list, return_type: str) -> MethodVisitor:
+    def visit_method(
+        self, name: str, access_flags: int, parameters: list, return_type: str
+    ) -> MethodVisitor:
         signature = f"{name}({''.join(parameters)}){return_type}"
         method = SmaliMethod(self.vm, self.smali_class, signature, access_flags)
         visitor = _SourceMethodVisitor(method)
@@ -418,7 +466,6 @@ class _SourceClassVisitor(ClassVisitor):
 
 
 class _SmaliClassLoader(ClassLoader):
-
     vm: SmaliVM
     """The vm storing all defined classes."""
 
@@ -432,7 +479,7 @@ class _SmaliClassLoader(ClassLoader):
         reader.visit(source, visitor)
         smali_class = visitor.smali_class
         if not smali_class:
-            raise ValueError('Could not parse class!')
+            raise ValueError("Could not parse class!")
 
         self.vm.new_class(smali_class)
         return smali_class
@@ -442,6 +489,7 @@ class _SmaliClassLoader(ClassLoader):
         if init:
             smali_class.clinit()
         return smali_class
+
 
 ####################################################################################################
 # EXTERNAL

@@ -33,21 +33,19 @@ import re
 
 from io import UnsupportedOperation
 
-from smali.base import (
-    AccessType,
-    SmaliValueProxy,
-    Type
-)
-from smali.bridge.errors import (
-    NoSuchMethodError,
-    NoSuchFieldError,
-    NoSuchClassError
-)
+from smali.base import AccessType, SmaliValueProxy, Type
+from smali.bridge.errors import NoSuchMethodError, NoSuchFieldError, NoSuchClassError
 
 __all__ = [
-    'SmaliMember', 'SmaliAnnotation', 'SmaliField', 'SmaliMethod',
-    'SmaliMethodBroker', 'SmaliClass', 'SmaliObject'
+    "SmaliMember",
+    "SmaliAnnotation",
+    "SmaliField",
+    "SmaliMethod",
+    "SmaliMethodBroker",
+    "SmaliClass",
+    "SmaliObject",
 ]
+
 
 class SmaliMember:
     """Base class for Python classes of the Smali language.
@@ -55,7 +53,7 @@ class SmaliMember:
     All members must provide a signature to be identified with.
     """
 
-    __parent: 'SmaliMember'
+    __parent: "SmaliMember"
     """The parent of this member."""
 
     __signature: str
@@ -72,13 +70,19 @@ class SmaliMember:
     { 'Ljava/lang/Deprecated;': [<SmaliAnnotation at 0x...>, ...] }
     """
 
-    def __init__(self, parent: 'SmaliMember', signature: str, modifiers: int,
-                 base_class: type, annotations: list = None) -> None:
+    def __init__(
+        self,
+        parent: "SmaliMember",
+        signature: str,
+        modifiers: int,
+        base_class: type,
+        annotations: list = None,
+    ) -> None:
         self.__signature = signature
         self.__modifiers = modifiers
         self.__annotations = annotations or []
         if self.__class__ != base_class:
-            raise TypeError(f'{base_class.__name__} cannot be sub-classed!')
+            raise TypeError(f"{base_class.__name__} cannot be sub-classed!")
 
         self.__parent = parent
         if not isinstance(self.parent, SmaliMember) and parent:
@@ -115,7 +119,7 @@ class SmaliMember:
         return self.__annotations.get(a_type, [])
 
     @property
-    def parent(self) -> 'SmaliMember':
+    def parent(self) -> "SmaliMember":
         """Returns the declaring class or annotation member.
 
         :return: the parent of this member
@@ -194,8 +198,14 @@ class SmaliAnnotation(SmaliMember):
     attr: dict
     """The attributes of this annotation (key-value map)."""
 
-    def __init__(self, parent, signature: str, modifiers: int,
-                 annotations: list = None, attr: dict = None) -> None:
+    def __init__(
+        self,
+        parent,
+        signature: str,
+        modifiers: int,
+        annotations: list = None,
+        attr: dict = None,
+    ) -> None:
         super().__init__(parent, signature, modifiers, SmaliAnnotation, annotations)
         self.attr = attr or {}
 
@@ -231,9 +241,16 @@ class SmaliField(SmaliMember):
     __value: SmaliValueProxy
     """Stores the actual value of this field"""
 
-    def __init__(self, parent, signature: str, modifiers: int, name: str,
-                 smali_type: Type, annotations: list = None,
-                 value: SmaliValueProxy = None) -> None:
+    def __init__(
+        self,
+        parent,
+        signature: str,
+        modifiers: int,
+        name: str,
+        smali_type: Type,
+        annotations: list = None,
+        value: SmaliValueProxy = None,
+    ) -> None:
         super().__init__(parent, signature, modifiers, SmaliField, annotations)
         self.__value = value
         self.__smali_type = smali_type
@@ -312,9 +329,14 @@ class SmaliMethod(SmaliMember):
     __locals: int
     """Stores the amount of locals"""
 
-
-    def __init__(self, vm, parent: 'SmaliMember', signature: str,
-                 modifiers: int, annotations: list = None) -> None:
+    def __init__(
+        self,
+        vm,
+        parent: "SmaliMember",
+        signature: str,
+        modifiers: int,
+        annotations: list = None,
+    ) -> None:
         super().__init__(parent, signature, modifiers, SmaliMethod, annotations)
         self.__vm = vm
         sig_type = Type(signature)
@@ -371,7 +393,7 @@ class SmaliMethod(SmaliMember):
     @locals.setter
     def locals(self, value: int):
         if not isinstance(value, int):
-            raise TypeError('Invalid locals argument type')
+            raise TypeError("Invalid locals argument type")
         self.__locals = value
 
 
@@ -407,7 +429,7 @@ class _MethodBroker:
         self.__methods = methods or []
         self.__name = name
 
-    def __iadd__(self, method: SmaliMethod) -> '_MethodBroker':
+    def __iadd__(self, method: SmaliMethod) -> "_MethodBroker":
         self.__methods.append(method)
 
     def __call__(self, instance, *args, **kwds) -> object:
@@ -439,11 +461,13 @@ class _MethodBroker:
                     )
                 # Filter by return type
                 if not returns:
-                    targets = list(filter(lambda x: (
-                        x.return_type.descriptor != 'V'), targets))
+                    targets = list(
+                        filter(lambda x: (x.return_type.descriptor != "V"), targets)
+                    )
                 else:
-                    targets = list(filter(lambda x: (
-                        x.return_type.descriptor == 'V'), targets))
+                    targets = list(
+                        filter(lambda x: (x.return_type.descriptor == "V"), targets)
+                    )
 
                 # We found one method, call it!
                 if len(targets) == 1:
@@ -453,7 +477,9 @@ class _MethodBroker:
         # 2. If registers are present, filter by amount
         # of defined parameters
         elif reg_count > 0:
-            targets = list(filter(lambda x: len(x.parameters) == reg_count, self.__methods))
+            targets = list(
+                filter(lambda x: len(x.parameters) == reg_count, self.__methods)
+            )
             # Again, we find the right method if only one result is present
             if len(targets) == 1:
                 method = targets[0]
@@ -475,6 +501,7 @@ class _MethodBroker:
 
 SmaliMethodBroker = _MethodBroker
 """Public alias for method broker objects"""
+
 
 class SmaliClass(SmaliMember):
     """Internal class for storing imported class data.
@@ -583,12 +610,17 @@ class SmaliClass(SmaliMember):
     __implements: list
     """The list of implemented interfaces."""
 
-    def __init__(self, parent: 'SmaliMember', signature: str,
-                 modifiers: int,  annotations: list = None) -> None:
+    def __init__(
+        self,
+        parent: "SmaliMember",
+        signature: str,
+        modifiers: int,
+        annotations: list = None,
+    ) -> None:
         super().__init__(parent, signature, modifiers, SmaliClass, annotations)
         sig_type = Type(signature)
         self.__name = sig_type.class_name
-        self.__simple_name = self.__name.split('.')[-1]
+        self.__simple_name = self.__name.split(".")[-1]
         self.__fields = {}
         self.__methods = {}
         self.__super = None
@@ -689,7 +721,7 @@ class SmaliClass(SmaliMember):
 
         raise NoSuchFieldError(f"Field with name '{name}' not found")
 
-    def inner_class(self, name: str) -> 'SmaliClass':
+    def inner_class(self, name: str) -> "SmaliClass":
         """Returns an inner class by its name.
 
         :param name: the name (type descrptor)
@@ -705,7 +737,7 @@ class SmaliClass(SmaliMember):
 
     def __setitem__(self, key: str, value) -> None:
         if not key or not isinstance(key, str):
-            raise KeyError('Invalid key')
+            raise KeyError("Invalid key")
 
         if isinstance(value, SmaliMethod):
             if key not in self.__methods:
@@ -721,7 +753,7 @@ class SmaliClass(SmaliMember):
 
     def __getitem__(self, key: str) -> SmaliField:
         if not key or not isinstance(key, str):
-            raise KeyError('Invalid Key')
+            raise KeyError("Invalid Key")
 
         return self.field(key)
 
@@ -736,6 +768,7 @@ class SmaliClass(SmaliMember):
         :param access_type: the access type to filter, defaults to None
         :type access_type: AccessType, optional
         """
+
         def field_filter(field: SmaliField):
             if not access_type:
                 return True
@@ -760,16 +793,17 @@ class SmaliClass(SmaliMember):
         # current class - for static context it is always null
         method(None)
 
-    def is_assignable(self, other: 'SmaliClass') -> bool:
+    def is_assignable(self, other: "SmaliClass") -> bool:
         if not other or not other.super_cls:
             return False
-        
+
         super_class = other.super_cls
-        while super_class and super_class != 'Ljava/lang/Object;':
+        while super_class and super_class != "Ljava/lang/Object;":
             if super_class == self or super_class == self.super_cls:
                 return True
-        
+
         return False
+
 
 class SmaliObject:
     """Python objects that store data of a Smali object.
@@ -794,12 +828,12 @@ class SmaliObject:
     :meta public:
     """
 
-
     def __init__(self, clazz: SmaliClass) -> None:
         self.__class = clazz
         if clazz.modifiers in (AccessType.ABSTRACT, AccessType.INTERFACE):
             raise UnsupportedOperation(
-                'Class is abstract and cannot be instantiated directly!')
+                "Class is abstract and cannot be instantiated directly!"
+            )
 
         self.__field_values = {}
         for name in clazz.fields():
@@ -807,10 +841,9 @@ class SmaliObject:
             if field.modifiers not in AccessType.STATIC:
                 self.__field_values[field.name] = None
 
-
     def init(self, *args):
         """Calls the constructor of this object."""
-        ctor = self.smali_class.method('<init>')
+        ctor = self.smali_class.method("<init>")
         ctor(self, *args)
 
     @property
@@ -828,7 +861,7 @@ class SmaliObject:
             return field.value
 
         if name not in self.__field_values:
-            raise NoSuchFieldError(f'Field not found: {name}')
+            raise NoSuchFieldError(f"Field not found: {name}")
 
         return self.__field_values[name]
 
@@ -836,7 +869,8 @@ class SmaliObject:
         field = self.smali_class.field(name)
         if field.modifiers in AccessType.FINAL:
             raise UnsupportedOperation(
-                f'Attempt to write in read-only field "{self.smali_class.name}{name}"')
+                f'Attempt to write in read-only field "{self.smali_class.name}{name}"'
+            )
 
         if field.modifiers in AccessType.STATIC:
             field.value = value

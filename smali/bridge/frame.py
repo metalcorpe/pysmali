@@ -23,9 +23,8 @@ calls) as well as the final return value. If any errors occur, they
 will be stored in a separate variable.
 """
 
-from smali.bridge.errors import (
-    ExecutionError, NoSuchRegisterError
-)
+from smali.bridge.errors import ExecutionError, NoSuchRegisterError
+
 
 class Frame:
     """Class to represent execution frames.

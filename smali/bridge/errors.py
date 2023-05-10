@@ -18,28 +18,39 @@ Common exceptions of the Smali-Python-Bridge
 """
 
 __all__ = [
-    'NoSuchClassError', 'NoSuchMethodError', 'NoSuchFieldError',
-    'NoSuchRegisterError', 'NoSuchOpcodeError', 'InvalidOpcodeError',
-    'ExecutionError'
+    "NoSuchClassError",
+    "NoSuchMethodError",
+    "NoSuchFieldError",
+    "NoSuchRegisterError",
+    "NoSuchOpcodeError",
+    "InvalidOpcodeError",
+    "ExecutionError",
 ]
+
 
 class NoSuchClassError(Exception):
     """The class is not defined or wasn't found"""
 
+
 class NoSuchMethodError(Exception):
     """The method is not defined"""
+
 
 class NoSuchFieldError(Exception):
     """The requested field is not defined"""
 
+
 class NoSuchRegisterError(Exception):
     """Unknown register was requested to be read"""
+
 
 class NoSuchOpcodeError(Exception):
     """The opcode does not exists or no implementation is present"""
 
+
 class InvalidOpcodeError(Exception):
     """The opcode is invalid"""
+
 
 class ExecutionError(Exception):
     """Wrapper class for runtime exceptions."""
@@ -55,4 +66,4 @@ class ExecutionError(Exception):
         return f"<{self.name} at {id(self)}"
 
     def __str__(self) -> str:
-        return super().__str__().replace('ExecutionError', self.name)
+        return super().__str__().replace("ExecutionError", self.name)

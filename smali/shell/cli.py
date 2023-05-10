@@ -20,34 +20,51 @@ from argparse import ArgumentParser
 from smali import VERSION
 from smali.shell import ISmaliShell
 
+
 def start_cli():
     """Starts the Smali interpreter."""
-    
-    parser = ArgumentParser(description=(
-        "ISmali (Interactive Smali interpreter) can execute Smali-Code snippets"
-        "on the fly as well as import *.smali files and use them later on."
-    ))
-    parser.add_argument('file', nargs='*',
-        help=("The Smali-Script files ('.ssf') to be interpreted. Note that"
-              " files as input won't result in interactive mode. Use the '-i'"
-              " flag to run the interactive mode afterwards."))
-    parser.add_argument('-i', '--interactive', action='store_true',
-        help=("Runs the interactive mode after executing/ importing input files."))
-    parser.add_argument('--version', action='store_true', 
-        help="Stores the current interpreter version")
+
+    parser = ArgumentParser(
+        description=(
+            "ISmali (Interactive Smali interpreter) can execute Smali-Code snippets"
+            "on the fly as well as import *.smali files and use them later on."
+        )
+    )
+    parser.add_argument(
+        "file",
+        nargs="*",
+        help=(
+            "The Smali-Script files ('.ssf') to be interpreted. Note that"
+            " files as input won't result in interactive mode. Use the '-i'"
+            " flag to run the interactive mode afterwards."
+        ),
+    )
+    parser.add_argument(
+        "-i",
+        "--interactive",
+        action="store_true",
+        help=("Runs the interactive mode after executing/ importing input files."),
+    )
+    parser.add_argument(
+        "--version", action="store_true", help="Stores the current interpreter version"
+    )
 
     args = parser.parse_args().__dict__
-    if args['version']:
+    if args["version"]:
         print(VERSION)
         sys.exit(0)
 
     shell = ISmaliShell()
-    files = args['file']
+    files = args["file"]
 
     if len(files) > 0:
-        for path in args['file']:
+        for path in args["file"]:
             shell.do_import(path)
 
-    if len(files) == 0 or args['interactive']:
-        shell.cmdloop((f"ISmali {VERSION} on {sys.platform}\nType"
-            " 'help' or 'copyright' for more information."))
+    if len(files) == 0 or args["interactive"]:
+        shell.cmdloop(
+            (
+                f"ISmali {VERSION} on {sys.platform}\nType"
+                " 'help' or 'copyright' for more information."
+            )
+        )

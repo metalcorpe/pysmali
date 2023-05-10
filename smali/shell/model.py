@@ -63,7 +63,7 @@ class DefaultVisitor(MethodVisitor, ClassVisitor):
 
     last_label: str
     """Stores the last label that has been typed"""
-    
+
     importing: bool = False
 
     def __init__(self, shell: 'ISmaliShell') -> None:
@@ -109,7 +109,7 @@ class DefaultVisitor(MethodVisitor, ClassVisitor):
     def visit_instruction(self, ins_name: str, args: list) -> None:
         for _, value in opcode.__dict__.items():
             if value == ins_name:
-                exc = executor.executor(ins_name)
+                exc = executor.get_executor(ins_name)
                 exc.args = args
                 exc(self.frame)
                 self.pos += 1
@@ -130,7 +130,7 @@ class DefaultVisitor(MethodVisitor, ClassVisitor):
         self.shell.root.smali_class[name] = field
         if access_flags not in AccessType.STATIC and value is not None:
             self.shell.root[name] = value
-        
+
         return SmaliVMFieldReader(field)
 
     def visit_return(self, ret_type: str, args: list) -> None:
@@ -155,12 +155,12 @@ class DefaultVisitor(MethodVisitor, ClassVisitor):
         self.shell.emulator.new_frame(method, visitor.frame)
         smali_class[name] = method
         return visitor
-    
+
     def visit_inner_class(self, name: str, access_flags: int) -> 'ClassVisitor':
         if self.importing:
             smali_class = self.shell.root.smali_class
             inner = SmaliClass(smali_class, name, access_flags)
-            
+
             smali_class[name] = inner
             return SmaliVMClassReader(self.shell.emulator, inner)
 
@@ -188,10 +188,10 @@ class ISmaliShell(Cmd):
 
     prompt: str = '>>> '
     """The prompt used by ``cmd.Cmd``"""
-    
+
     check_import: bool = True
     """Used to indicate whether this shell should verify each import"""
-    
+
     __imported_files: list = []
     """Internal file list"""
 
@@ -216,7 +216,7 @@ class ISmaliShell(Cmd):
         if not os.path.exists(path):
             print(f'! Could not find file at "{path}"')
             return
-            
+
         if path in self.__imported_files and self.check_import:
             return
 
@@ -233,7 +233,7 @@ class ISmaliShell(Cmd):
                 self.visitor.importing = False
             else:
                 cls = self.emulator.classloader.load_class(source, init=False)
-            
+
 
         try:
             if cls is not None:

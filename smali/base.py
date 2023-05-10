@@ -21,10 +21,8 @@ import re
 
 from enum import Enum, IntFlag
 
-__all__ = [
-    'AccessType', 'Token', 'Line', 'Type',
-    'smali_value', 'SmaliValueProxy'
-]
+__all__ = ["AccessType", "Token", "Line", "Type", "smali_value", "SmaliValueProxy"]
+
 
 class AccessType(IntFlag):
     """Contains all access modifiers for classes, fields, methods and annotations.
@@ -78,7 +76,7 @@ class AccessType(IntFlag):
 
             element = str(element).lower()
             for val in AccessType:
-                if val.name.lower().replace('_', '-') == element:
+                if val.name.lower().replace("_", "-") == element:
                     result |= val.value
         return result
 
@@ -94,7 +92,7 @@ class AccessType(IntFlag):
         result = []
         for val in AccessType:
             if flags in val:
-                result.append(val.name.lower().replace('_', '-'))
+                result.append(val.name.lower().replace("_", "-"))
         return result
 
     @staticmethod
@@ -107,7 +105,7 @@ class AccessType(IntFlag):
         :rtype: bool
         """
         for val in AccessType:
-            name = val.name.lower().replace('_', '-')
+            name = val.name.lower().replace("_", "-")
             if name == value:
                 return True
         return False
@@ -118,6 +116,7 @@ class AccessType(IntFlag):
         if isinstance(other, int):
             return self.value & other != 0
         raise TypeError(f"Unsupported type: {type(other)}")
+
 
 class Token(Enum):
     """Defines all common token in a Smali file.
@@ -135,29 +134,29 @@ class Token(Enum):
     'array-data'
     """
 
-    ANNOTATION = 'annotation'
-    ARRAYDATA = 'array-data'
-    CATCH = 'catch'
-    CATCHALL = 'catchall'
-    CLASS = 'class'
-    END = 'end'
-    ENUM = 'enum'
-    FIELD = 'field'
-    IMPLEMENTS = 'implements'
-    LINE = 'line'
-    LOCAL = 'local'
-    LOCALS = 'locals'
-    METHOD = 'method'
-    PACKEDSWITCH = 'packed-switch'
-    PARAM = 'param'
-    PROLOGUE = 'prologue'
-    REGISTERS = 'registers'
-    RESTART = 'restart'
-    SOURCE = 'source'
-    SPARSESWITCH = 'sparse-switch'
-    SUBANNOTATION = 'subannotation'
-    SUPER = 'super'
-    DEBUG = 'debug'
+    ANNOTATION = "annotation"
+    ARRAYDATA = "array-data"
+    CATCH = "catch"
+    CATCHALL = "catchall"
+    CLASS = "class"
+    END = "end"
+    ENUM = "enum"
+    FIELD = "field"
+    IMPLEMENTS = "implements"
+    LINE = "line"
+    LOCAL = "local"
+    LOCALS = "locals"
+    METHOD = "method"
+    PACKEDSWITCH = "packed-switch"
+    PARAM = "param"
+    PROLOGUE = "prologue"
+    REGISTERS = "registers"
+    RESTART = "restart"
+    SOURCE = "source"
+    SPARSESWITCH = "sparse-switch"
+    SUBANNOTATION = "subannotation"
+    SUPER = "super"
+    DEBUG = "debug"
 
     def __eq__(self, other: str) -> bool:
         if isinstance(other, self.__class__):
@@ -174,6 +173,7 @@ class Token(Enum):
 
     def __str__(self) -> str:
         return self.value
+
 
 class Line:
     """Simple peekable Iterator implementation."""
@@ -237,7 +237,7 @@ class Line:
             # Remove the EOL comment and save it in a variable. Note
             # that the visitor will be notified when StopIteration is
             # raised.
-            self.eol_comment = eol_match.group(0).lstrip('# ')
+            self.eol_comment = eol_match.group(0).lstrip("# ")
             self.cleaned = self.cleaned[:start] + self.cleaned[end:]
 
         self._elements = Line.split_line(self.cleaned)
@@ -292,7 +292,7 @@ class Line:
         return len(self.cleaned)
 
     @staticmethod
-    def split_line(cleaned: str, sep: str = ' ') -> list:
+    def split_line(cleaned: str, sep: str = " ") -> list:
         """Splits the line by the given delimiter and ignores values in strings
 
         :param cleaned: the input string
@@ -308,10 +308,10 @@ class Line:
         elements = []
 
         while end != -1:
-            if end-1 > 0 and cleaned[end-1] == '"':
+            if end - 1 > 0 and cleaned[end - 1] == '"':
                 in_literal = False
                 elements.append(cleaned[start:end])
-                start = end+1
+                start = end + 1
 
             elif cleaned[start] == '"':
                 in_literal = True
@@ -320,18 +320,18 @@ class Line:
                 elements.append(cleaned[start:end])
                 start = end + 1
 
-            end = cleaned.find(sep, end+1)
+            end = cleaned.find(sep, end + 1)
         elements.append(cleaned[start:])
         return elements
 
-class Type:
-    """Basic type definition that can handle both class and method types.
-    """
 
-    CLINIT = '<clinit>'
+class Type:
+    """Basic type definition that can handle both class and method types."""
+
+    CLINIT = "<clinit>"
     """Static block initializer"""
 
-    INIT = '<init>'
+    INIT = "<init>"
     """Constructor method"""
 
     def __init__(self, signature: str) -> None:
@@ -350,16 +350,16 @@ class Type:
         if SmaliValueProxy.RE_TYPE_VALUE.match(name):
             return name
 
-        if name.startswith('['):
-            idx = name.rfind('[')
-            prefix = name[ :idx]
-            if not name.endswith(';') and name not in "ZCBSIFVJD":
+        if name.startswith("["):
+            idx = name.rfind("[")
+            prefix = name[:idx]
+            if not name.endswith(";") and name not in "ZCBSIFVJD":
                 return prefix + f"L{name[idx+1:].replace('.', '/')};"
 
             return prefix + f"{name[idx+1:].replace('.', '/')}"
 
         name = f"{name.replace('.', '/')}"
-        if name[-1] != ';' and name not in "ZCBSIFVJD":
+        if name[-1] != ";" and name not in "ZCBSIFVJD":
             name = f"L{name};"
         return name
 
@@ -372,8 +372,8 @@ class Type:
         """
         if not SmaliValueProxy.RE_TYPE_VALUE.match(self.__signature):
             return self.__signature
-        name = self.__signature.lstrip('[').replace('.', '/')
-        return name.lstrip('L').rstrip(';')
+        name = self.__signature.lstrip("[").replace(".", "/")
+        return name.lstrip("L").rstrip(";")
 
     @property
     def class_name(self) -> str:
@@ -382,7 +382,7 @@ class Type:
         :return: the class name (e.g. "com.example.ABC")
         :rtype: str
         """
-        return self.type_name.replace('/', '.').replace('[', '')
+        return self.type_name.replace("/", ".").replace("[", "")
 
     def get_method_name(self) -> str:
         """Returns the method name
@@ -390,16 +390,17 @@ class Type:
         :return: the absolute method name
         :rtype: str
         """
-        idx = self.__signature.find('(')
+        idx = self.__signature.find("(")
         if idx == -1:
             raise TypeError(
-                f'Invalid method signature: could not find name ({self.__signature})')
+                f"Invalid method signature: could not find name ({self.__signature})"
+            )
 
         # Handle bracket names if not <clinit> or <init>
         name = self.__signature[:idx]
         if name in (Type.INIT, Type.CLINIT):
             return name
-        return name.rstrip('>').lstrip('<')
+        return name.rstrip(">").lstrip("<")
 
     def get_method_params(self) -> list:
         """Returns the method parameter internal names.
@@ -407,12 +408,12 @@ class Type:
         :return: the method parameters
         :rtype: list
         """
-        start = self.__signature.find('(')
-        end = self.__signature.find(')')
+        start = self.__signature.find("(")
+        end = self.__signature.find(")")
         if start == -1 or end == -1:
-            raise TypeError('Invalid method signature')
+            raise TypeError("Invalid method signature")
 
-        params = self.__signature[start+1:end]
+        params = self.__signature[start + 1 : end]
         if not params:
             return []
 
@@ -421,17 +422,17 @@ class Type:
         is_type = False
         current = ""
         while idx < len(params):
-            if params[idx] == 'L':
+            if params[idx] == "L":
                 is_type = True
-            elif params[idx] == ';':
+            elif params[idx] == ";":
                 is_type = False
-                current += ';'
+                current += ";"
                 param_list.append(current)
                 current = ""
                 idx += 1
                 continue
-            elif params[idx] == '[':
-                current += '['
+            elif params[idx] == "[":
+                current += "["
                 idx += 1
                 continue
 
@@ -450,15 +451,16 @@ class Type:
         :return: the return type's descriptor
         :rtype: str
         """
-        end = self.__signature.find(')')
+        end = self.__signature.find(")")
         if end == -1:
-            raise TypeError('Invalid method signature')
-        return self.__signature[end+1:]
+            raise TypeError("Invalid method signature")
+        return self.__signature[end + 1 :]
 
     def __str__(self) -> str:
         return self.__signature
 
-def smali_value(value: str) -> 'SmaliValueProxy':
+
+def smali_value(value: str) -> "SmaliValueProxy":
     """Parses the given string and returns its Smali value representation.
 
     :param value: the value as a string
@@ -473,7 +475,7 @@ def smali_value(value: str) -> 'SmaliValueProxy':
     for i, entry in enumerate(SmaliValueProxy.TYPE_MAP):
         matcher, wrapper = entry
         if matcher.match(sm_value.value):
-            if i <= 3: # hex value possible
+            if i <= 3:  # hex value possible
                 hex_val = SmaliValueProxy.RE_HEX_VALUE.match(value) is not None
                 if not hex_val:
                     sm_value.actual_value = wrapper(value)
@@ -482,7 +484,6 @@ def smali_value(value: str) -> 'SmaliValueProxy':
             else:
                 sm_value.actual_value = wrapper(value)
             break
-
 
     # Handling of null values is not implemented yet
     if sm_value.actual_value is None:
@@ -495,6 +496,7 @@ def smali_value(value: str) -> 'SmaliValueProxy':
 
     vars(sm_value).update(sm_locals)
     return sm_value
+
 
 class SmaliValueProxy:
     """Wrapper class for primitives in Smali.
@@ -542,7 +544,7 @@ class SmaliValueProxy:
     RE_STRING_VALUE = re.compile(r'^".*"$')
     """Pattern for ``String`` values."""
 
-    RE_TYPE_VALUE = re.compile(r"\[*((L\S*;$)|([ZCBSIFVJD])$)") # NOQA
+    RE_TYPE_VALUE = re.compile(r"\[*((L\S*;$)|([ZCBSIFVJD])$)")  # NOQA
     """Pattern for type descriptors."""
 
     RE_BOOL_VALUE = re.compile(r"true|false")
@@ -556,12 +558,12 @@ class SmaliValueProxy:
         (RE_LONG_VALUE, int),
         (RE_BYTE_VALUE, int),
         (RE_INT_VALUE, int),
-        (RE_BOOL_VALUE, lambda x: x == 'true'),
+        (RE_BOOL_VALUE, lambda x: x == "true"),
         (RE_FLOAT_VALUE, float),
         (RE_DOUBLE_VALUE, float),
         (RE_CHAR_VALUE, lambda x: str(x[1:-1])),
         (RE_STRING_VALUE, lambda x: str(x[1:-1])),
-        (RE_TYPE_VALUE, Type)
+        (RE_TYPE_VALUE, Type),
     ]
     """Defines custom handlers for actual value defintions
 
@@ -585,38 +587,38 @@ class SmaliValueProxy:
         """
         return SmaliValueProxy.RE_TYPE_VALUE.match(value) is not None
 
+
 ####################################################################################
 # INTERNAL
 ####################################################################################
 
 __smali_builtins__ = [
-    "__contains__", "__eq__", "__ne__", "__len__", "__str__",
-    "__next__", "__bool__", "__repr__", "__str__", "__bytes__",
-    "__format__", "__lt__", "__le__", "__eq__", "__ne__", "__gt__", "__ge__",
-    "__hash__", "__bool__", "__len__", "__length_hint__", "__getitem__",
-    "__setitem__", "__delitem__", "__missing__", "__iter__", "__reversed__",
-    "__contains__", "__add__", "__sub__", "__mul__", "__truediv__",
-    "__floordiv__", "__mod__", "__divmod__", "__lshift__", "__rshift__",
-    "__and__", "__xor__", "__or__", "__radd__", "__rsub__", "__rmul__",
-    "__rtruediv__", "__rfloordiv__", "__rmod__", "__rdivmod__", "__rlshift__",
-    "__rrshift__", "__rand__", "__rxor__", "__ror__", "__neg__", "__pos__",
-    "__abs__", "__invert__", "__complex__", "__int__", "__float__", "__index__",
-    "__trunc__", "__floor__", "__ceil__",
+    "__contains__", "__eq__", "__ne__", "__len__", "__str__", "__next__", "__bool__",
+    "__repr__", "__str__", "__bytes__", "__format__", "__lt__", "__le__", "__eq__",
+    "__ne__", "__gt__", "__ge__", "__hash__", "__bool__", "__len__", "__length_hint__",
+    "__getitem__", "__setitem__", "__delitem__", "__missing__", "__iter__", "__reversed__",
+    "__contains__", "__add__", "__sub__", "__mul__", "__truediv__", "__floordiv__",
+    "__mod__", "__divmod__", "__lshift__", "__rshift__", "__and__", "__xor__", "__or__",
+    "__radd__", "__rsub__", "__rmul__", "__rtruediv__", "__rfloordiv__", "__rmod__",
+    "__rdivmod__", "__rlshift__", "__rrshift__", "__rand__", "__rxor__", "__ror__",
+    "__neg__", "__pos__", "__abs__", "__invert__", "__complex__", "__int__", "__float__",
+    "__index__", "__trunc__", "__floor__", "__ceil__",
 ]
 
 __smali_specials__ = [
-    ("__iadd__", lambda x,y: x.actual_value+y.actual_value),
-    ("__isub__", lambda x,y: x.actual_value-y.actual_value),
-    ("__imul__", lambda x,y: x.actual_value*y.actual_value),
-    ("__itruediv__", lambda x,y: x.actual_value/y.actual_value),
-    ("__ifloordiv__", lambda x,y: x.actual_value//y.actual_value),
-    ("__imod__", lambda x,y: x.actual_value%y.actual_value),
-    ("__ilshift__", lambda x,y: x.actual_value<<y.actual_value),
-    ("__irshift__", lambda x,y: x.actual_value>>y.actual_value),
-    ("__iand__", lambda x,y: x.actual_value&y.actual_value),
-    ("__ixor__", lambda x,y: x.actual_value^y.actual_value),
-    ("__ior__", lambda x,y: x.actual_value|y.actual_value)
+    ("__iadd__", lambda x, y: x.actual_value + y.actual_value),
+    ("__isub__", lambda x, y: x.actual_value - y.actual_value),
+    ("__imul__", lambda x, y: x.actual_value * y.actual_value),
+    ("__itruediv__", lambda x, y: x.actual_value / y.actual_value),
+    ("__ifloordiv__", lambda x, y: x.actual_value // y.actual_value),
+    ("__imod__", lambda x, y: x.actual_value % y.actual_value),
+    ("__ilshift__", lambda x, y: x.actual_value << y.actual_value),
+    ("__irshift__", lambda x, y: x.actual_value >> y.actual_value),
+    ("__iand__", lambda x, y: x.actual_value & y.actual_value),
+    ("__ixor__", lambda x, y: x.actual_value ^ y.actual_value),
+    ("__ior__", lambda x, y: x.actual_value | y.actual_value),
 ]
+
 
 def __wrap_args__(self, target: str, *args):
     """Tries to wrap ``SmalivalueProxy`` objects before calling the special method.
@@ -639,18 +641,27 @@ def __wrap_args__(self, target: str, *args):
 
     return self.__dict__[target](*new_args)
 
+
 for method in __smali_builtins__:
-    setattr(SmaliValueProxy, method,
-        lambda self, *args, method=method: __wrap_args__(self, method, *args)
+    setattr(
+        SmaliValueProxy,
+        method,
+        lambda self, *args, method=method: __wrap_args__(self, method, *args),
     )
+
 
 def __wrap_special__(instance, actual_val, val, funct):
     funct(actual_val, val)
     return instance
 
+
 for method, func in __smali_specials__:
-    setattr(SmaliValueProxy, method,
-        lambda self, val, func=func: __wrap_special__(self, self.actual_value, val, func)
+    setattr(
+        SmaliValueProxy,
+        method,
+        lambda self, val, func=func: __wrap_special__(
+            self, self.actual_value, val, func
+        ),
     )
 
 del method
