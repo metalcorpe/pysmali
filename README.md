@@ -8,8 +8,7 @@
 ![PyPi](https://img.shields.io:/static/v1?label=PyPi&message=0.1.1&color=lightblue)
 
 
-The main functionalities of this repository cover creating and parsing Smali files with Python3 as well as interpret Smali source code files. There is also an interace interpreter provided that
-acts as a Python-CLI.
+The main functionalities of this repository cover creating and parsing Smali files with Python3 as well as interpret Smali source code files. There is also an interactive interpreter provided that acts as a Python-CLI.
 
 
 ## Installation
