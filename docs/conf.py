@@ -39,8 +39,6 @@ master_doc = 'index'
 # The suffix of source filenames.
 source_suffix = '.rst'
 
-autodoc_mock_imports = ['bs4', 'requests']
-
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
