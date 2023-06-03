@@ -2,14 +2,13 @@
 
 [![python](https://img.shields.io/badge/python-3.8+-blue.svg?logo=python&labelColor=lightgrey)](https://www.python.org/downloads/)
 ![LastEdit](https://img.shields.io:/static/v1?label=LastEdit&message=06/03/2023&color=9cf)
-![Status](https://img.shields.io:/static/v1?label=Status&message=Pre-Release&color=lightgreen)
-![Platform](https://img.shields.io:/static/v1?label=Platforms&message=Linux|Windows&color=yellowgreen)
-[![Documentation Status](https://readthedocs.org/projects/pysmali/badge/?version=latest)](https://pysmali.readthedocs.io/en/latest/?badge=latest)
+![Status](https://img.shields.io:/static/v1?label=Status&message=Pre-Release&color=teal)
+![Platform](https://img.shields.io:/static/v1?label=Platforms&message=Linux|Windows&color=lightgrey)
+[![Build and Deploy Sphinx Documentation](https://github.com/MatrixEditor/pysmali/actions/workflows/sphinx.yml/badge.svg)](https://github.com/MatrixEditor/pysmali/actions/workflows/sphinx.yml)
 ![PyPi](https://img.shields.io:/static/v1?label=PyPi&message=0.1.3&color=lightblue)
 
 
 The main functionalities of this repository cover creating and parsing Smali files with Python3 as well as interpret Smali source code files. There is also an interactive interpreter provided that acts as a Python-CLI.
-
 
 ## Installation
 
@@ -23,7 +22,7 @@ $ pip install pysmali
 
 ## Usage
 
-For a more detailed explanation of the Smali Visitor-API use the [docs](https://pysmali.readthedocs.io/).
+For a more detailed explanation of the Smali Visitor-API use the [Github-Pages Docs](https://matrixeditor.github.io/pysmali/).
 
 ### ISmali (Interactive Smali Interpreter)
 
@@ -43,7 +42,7 @@ Some notes:
 * ``vars``: This command can be used to print all registers together with their values
 * `L<Root>;`: The name of the root-context class
 
-The API [documentation](https://pysmali.readthedocs.io/) provides some usage examples and usage hints.
+The API [documentation](https://matrixeditor.github.io/pysmali/) provides some usage examples and usage hints.
 
 ### Parsing Smali-Files
 
