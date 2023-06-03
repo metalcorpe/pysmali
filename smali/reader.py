@@ -881,8 +881,8 @@ class SmaliReader:
         if do_copy:
             self._copy_line()
         self._publish_comment()
-        self._next_line()
         while True:
+            self._next_line()
             value = self.line.peek()
             self._publish_comment()
             if do_copy:
@@ -929,8 +929,8 @@ class SmaliReader:
         if do_copy:
             self._copy_line()
         self._publish_comment()
-        self._next_line()
         while True:
+            self._next_line()
             key = self.line.peek()
             self._publish_comment()
             if do_copy:
