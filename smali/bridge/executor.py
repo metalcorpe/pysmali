@@ -2,7 +2,7 @@
 import struct
 
 from smali import SmaliValue, Type
-from smali.opcode import * # noqa
+from smali.opcode import *  # noqa
 from smali.bridge.frame import Frame
 from smali.bridge.errors import ExecutionError
 from smali.bridge.lang import SmaliObject
@@ -159,7 +159,9 @@ def invoke(self: Executor, inv_type, args, owner, method):
             vm_class = self.frame.vm.get_class(owner)
 
         target = vm_class.method(method)
-        self.frame.method_return = self.frame.vm.call(target, instance, *values)
+        self.frame.method_return = self.frame.vm.call(
+            target, instance, *values, vm__frame=self.frame
+        )
 
 
 @opcode_executor()
@@ -371,12 +373,12 @@ def new_instance(self: Executor, register: str, descriptor: str):
 
 @opcode_executor()
 def new_array(self: Executor, dest: str, count_register: str, descriptor: str):
-    cls = Type(descriptor).class_name
+    cls_name = Type(descriptor).class_name
     values = [None] * self.frame[count_register]
-    if cls in "BSIJ":  # number
+    if cls_name in "BSIJ":  # number
         values = [0] * self.frame[count_register]
 
-    elif cls in "FD":  # floating point
+    elif cls_name in "FD":  # floating point
         values = [0.0] * self.frame[count_register]
 
     self.frame[dest] = values

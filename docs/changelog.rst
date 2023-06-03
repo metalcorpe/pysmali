@@ -4,6 +4,16 @@
 Changelog
 *********
 
+.. _release-0.1.3:
+
+0.1.3
+=====
+
+* Fixed an issue in :class:`SmaliReader` that causes it to run into infinite loops (kudos to `metalcorpe <https://github.com/metalcorpe>`_)
+* Moved to Github-Pages instead of ReadTheDocs
+* Added the field ``parent`` to an execution :class:`Frame` to enable backtracking of call stacks
+* Some issues around :class:`Type` and :class:`SmaliValueProxy` fixed
+
 .. _release-0.1.2:
 
 0.1.2
