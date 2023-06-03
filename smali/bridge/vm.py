@@ -151,7 +151,7 @@ class SmaliVM:
         self,
         class_loader: ClassLoader = None,
         executors: dict = executor.cache,
-        use_strict: bool = False
+        use_strict: bool = False,
     ) -> None:
         self.classloader = _SmaliClassLoader(self) or class_loader
         self.executors = executors or {}
@@ -230,6 +230,10 @@ class SmaliVM:
                     f"Expected instance of '{instance.smali_class.name}'",
                 )
             frame.registers["p0"] = instance
+
+        prev_frame = kwargs.pop("vm__frame", None)
+        if prev_frame:
+            frame.parent = prev_frame
 
         # validate method and set parameter values
         self._validate_call(method, frame, args, kwargs)
@@ -318,7 +322,7 @@ class _SourceAnnotationVisitor(AnnotationVisitor):
     ) -> "AnnotationVisitor":
         sub = SmaliAnnotation(self.annotation, signature, access_flags)
         self.annotation[name] = sub
-        return _SourceAnnotationVisitor(sub)
+        return SmaliVMAnnotationReader(sub)
 
 
 class _SourceFieldVisitor(FieldVisitor):
@@ -331,7 +335,7 @@ class _SourceFieldVisitor(FieldVisitor):
     def visit_annotation(self, access_flags: int, signature: str) -> AnnotationVisitor:
         annotation = SmaliAnnotation(self.field, signature, access_flags)
         self.field.annotations.append(annotation)
-        return _SourceAnnotationVisitor(annotation)
+        return SmaliVMAnnotationReader(annotation)
 
 
 class _SourceMethodVisitor(MethodVisitor):
@@ -348,7 +352,7 @@ class _SourceMethodVisitor(MethodVisitor):
     def visit_annotation(self, access_flags: int, signature: str) -> AnnotationVisitor:
         annotation = SmaliAnnotation(self.method, signature, access_flags)
         self.method.annotations.append(annotation)
-        return _SourceAnnotationVisitor(annotation)
+        return SmaliVMAnnotationReader(annotation)
 
     def visit_block(self, name: str) -> None:
         self.frame.labels[name] = self.pos
@@ -388,15 +392,18 @@ class _SourceMethodVisitor(MethodVisitor):
     def visit_instruction(self, ins_name: str, args: list) -> None:
         cache: dict = self.frame.vm.executors
         for _, value in opcode.__dict__.items():
-             # If the value of an attribute is equal to the given instruction
-             # name,
+            # If the value of an attribute is equal to the given instruction
+            # name,
             if value == ins_name:
                 # Check if the instruction name is not in the list of executors
                 # in the current frame's virtual machine
                 if ins_name not in cache and not self.frame.vm.use_strict:
-                    # If not, add a tuple of the "nop" opcode function and the
-                    # instruction arguments to the frame's opcodes list.
-                    func = cache["nop"] if "nop" in cache else executor.nop
+                    if "*" in cache:
+                        func = cache["*"]
+                    else:
+                        # If not, add a tuple of the "nop" opcode function and the
+                        # instruction arguments to the frame's opcodes list.
+                        func = cache["nop"] if "nop" in cache else executor.nop
                     self.frame.opcodes.append((func, args))
                 else:
                     # If yes, add a tuple of the executor function for the instruction
@@ -429,7 +436,7 @@ class _SourceClassVisitor(ClassVisitor):
     def visit_annotation(self, access_flags: int, signature: str) -> AnnotationVisitor:
         annotation = SmaliAnnotation(self.smali_class, signature, access_flags)
         self.smali_class.annotations.append(annotation)
-        return _SourceAnnotationVisitor(annotation)
+        return SmaliVMAnnotationReader(annotation)
 
     def visit_class(self, name: str, access_flags: int) -> None:
         self.smali_class = SmaliClass(None, name, access_flags)
@@ -437,7 +444,7 @@ class _SourceClassVisitor(ClassVisitor):
     def visit_inner_class(self, name: str, access_flags: int) -> "ClassVisitor":
         inner = SmaliClass(self.smali_class, name, access_flags)
         self.smali_class[name] = inner
-        return _SourceClassVisitor(self.vm, inner)
+        return SmaliVMClassReader(self.vm, inner)
 
     def visit_field(
         self, name: str, access_flags: int, field_type: str, value=None
@@ -451,14 +458,14 @@ class _SourceClassVisitor(ClassVisitor):
             value=SmaliValue(value) if value else None,
         )
         self.smali_class[name] = field
-        return _SourceFieldVisitor(field)
+        return SmaliVMFieldReader(field)
 
     def visit_method(
         self, name: str, access_flags: int, parameters: list, return_type: str
     ) -> MethodVisitor:
         signature = f"{name}({''.join(parameters)}){return_type}"
         method = SmaliMethod(self.vm, self.smali_class, signature, access_flags)
-        visitor = _SourceMethodVisitor(method)
+        visitor = SmaliVMMethodReader(method)
         self.vm.new_frame(method, visitor.frame)
         self.smali_class[name] = method
         return visitor
@@ -480,7 +487,7 @@ class _SmaliClassLoader(ClassLoader):
     def define_class(self, source: bytes) -> SmaliClass:
         reader = SmaliReader(validate=True, comments=False)
 
-        visitor = _SourceClassVisitor(self.vm)
+        visitor = SmaliVMClassReader(self.vm)
         reader.visit(source, visitor)
         smali_class = visitor.smali_class
         if not smali_class:

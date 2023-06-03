@@ -83,6 +83,9 @@ class Frame:
     switch_data: dict
     """Stores packed and sparse-switch data"""
 
+    parent: "Frame" = None
+    """Parent execution context (mainly used for backtracking)"""
+
     def __init__(self):
         self.registers = {}
         self.opcodes = []
@@ -99,6 +102,7 @@ class Frame:
         self.finished = False
         self.pos = 0
         self.return_value = None
+        self.parent = None
         self.registers.clear()
 
     def __getitem__(self, key: str):

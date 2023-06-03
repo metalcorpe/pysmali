@@ -37,6 +37,9 @@ class AccessType(IntFlag):
     False
     """
 
+    # !! IMPORTANT: Although, all access types from here (https://source.android.com/docs/core/runtime/dex-format#access-flags)
+    # are covered, their values differ as there are multiple access flags with the same value.
+    # REVISIT: Maybe convert this class into a dictionary
     PUBLIC = 0x1
     PRIVATE = 0x2
     PROTECTED = 0x4
@@ -335,7 +338,7 @@ class Type:
     """Constructor method"""
 
     def __init__(self, signature: str) -> None:
-        self.__signature = signature
+        self.__signature = signature.strip()
         if isinstance(signature, type):
             self.__signature = f"{signature.__module__}.{signature.__name__}"
 
@@ -362,6 +365,15 @@ class Type:
         if name[-1] != ";" and name not in "ZCBSIFVJD":
             name = f"L{name};"
         return name
+
+    @property
+    def dim(self) -> int:
+        """Returns the amount of array dimensions.
+
+        :return: the amount of array dimensions.
+        :rtype: int
+        """
+        return self.__signature.count("[")
 
     @property
     def type_name(self) -> str:
@@ -396,10 +408,14 @@ class Type:
                 f"Invalid method signature: could not find name ({self.__signature})"
             )
 
-        # Handle bracket names if not <clinit> or <init>
+
         name = self.__signature[:idx]
+        if "->" in name:
+            name = name[name.find("->") + 2:]
+        # Handle bracket names if not <clinit> or <init>
         if name in (Type.INIT, Type.CLINIT):
             return name
+
         return name.rstrip(">").lstrip("<")
 
     def get_method_params(self) -> list:
@@ -409,7 +425,7 @@ class Type:
         :rtype: list
         """
         start = self.__signature.find("(")
-        end = self.__signature.find(")")
+        end = self.__signature.find(")") + 1
         if start == -1 or end == -1:
             raise TypeError("Invalid method signature")
 
@@ -418,30 +434,26 @@ class Type:
             return []
 
         param_list = []
-        idx = 0
-        is_type = False
-        current = ""
-        while idx < len(params):
-            if params[idx] == "L":
-                is_type = True
-            elif params[idx] == ";":
-                is_type = False
-                current += ";"
-                param_list.append(current)
-                current = ""
-                idx += 1
-                continue
-            elif params[idx] == "[":
-                current += "["
-                idx += 1
+        current_param = ""
+        is_type_def = False
+        for char in params:
+            current_param = f"{current_param}{char}"
+
+            if char == "L":
+                is_type_def = True
                 continue
 
-            if is_type:
-                current += params[idx]
-            else:
-                param_list.append(params[idx])
-            idx += 1
+            if char == "[" or is_type_def:
+                continue
 
+            if char == ";":
+                is_type_def = False
+
+            param_list.append(current_param)
+            current_param = ""
+
+        if current_param:
+            param_list.append(current_param)
         return param_list
 
     def get_method_return_type(self) -> str:
@@ -459,6 +471,8 @@ class Type:
     def __str__(self) -> str:
         return self.__signature
 
+    def __repr__(self) -> str:
+        return f"<Type sig='{self.__signature}'>"
 
 def smali_value(value: str) -> "SmaliValueProxy":
     """Parses the given string and returns its Smali value representation.
@@ -520,7 +534,7 @@ class SmaliValueProxy:
     11
     """
 
-    RE_INT_VALUE = re.compile(r"[\-\+]?(0x)?[\dabcdefABCDEF]+")
+    RE_INT_VALUE = re.compile(r"[\-\+]?(0x)?[\dabcdefABCDEF]+$")
     """Pattern for ``int`` values."""
 
     RE_BYTE_VALUE = re.compile(r"[\-\+]?(0x)?[\dabcdefABCDEF]+t$")
@@ -529,10 +543,10 @@ class SmaliValueProxy:
     RE_SHORT_VALUE = re.compile(r"[\-\+]?(0x)?[\dabcdefABCDEF]+s$")
     """Pattern for ``short`` values."""
 
-    RE_FLOAT_VALUE = re.compile(r"[\-\+]?(0x)?\d+\.\d+f$")
+    RE_FLOAT_VALUE = re.compile(r"[\-\+]?\d+\.\d+f$")
     """Pattern for ``float`` values."""
 
-    RE_DOUBLE_VALUE = re.compile(r"[\-\+]?(0x)?\d+\.\d+")
+    RE_DOUBLE_VALUE = re.compile(r"[\-\+]?\d+\.\d+")
     """Pattern for ``double`` values."""
 
     RE_LONG_VALUE = re.compile(r"[\-\+]?(0x)?[\dabcdefABCDEF]+l$")
@@ -554,13 +568,13 @@ class SmaliValueProxy:
     """Pattern for integer values."""
 
     TYPE_MAP: list = [
-        (RE_SHORT_VALUE, int),
-        (RE_LONG_VALUE, int),
-        (RE_BYTE_VALUE, int),
+        (RE_SHORT_VALUE, lambda x, **kw: int(x[:-1], **kw)),
+        (RE_LONG_VALUE, lambda x, **kw: int(x[:-1], **kw)),
+        (RE_BYTE_VALUE, lambda x, **kw: int(x[:-1], **kw)),
         (RE_INT_VALUE, int),
-        (RE_BOOL_VALUE, lambda x: x == "true"),
-        (RE_FLOAT_VALUE, float),
-        (RE_DOUBLE_VALUE, float),
+        (RE_BOOL_VALUE, lambda x: str(x).lower() == "true"),
+        (RE_FLOAT_VALUE, lambda x: float(x[:-1])),
+        (RE_DOUBLE_VALUE, lambda x: float(x[:-1])),
         (RE_CHAR_VALUE, lambda x: str(x[1:-1])),
         (RE_STRING_VALUE, lambda x: str(x[1:-1])),
         (RE_TYPE_VALUE, Type),
