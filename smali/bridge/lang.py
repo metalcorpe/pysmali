@@ -35,7 +35,6 @@ from io import UnsupportedOperation
 
 from smali.base import AccessType, SmaliValueProxy, SVMType, Signature
 from smali.bridge.errors import NoSuchMethodError, NoSuchFieldError, NoSuchClassError
-from smali.bridge.lang import SmaliMember
 
 __all__ = [
     "SmaliMember",
@@ -75,14 +74,14 @@ class SmaliMember:
 
     def __init__(
         self,
-        _type: str,
+        type_: str,
         parent: "SmaliMember",
         signature: str,
         modifiers: int,
         base_class: type,
         annotations: list = None,
     ) -> None:
-        self.__type = SVMType(str(_type))
+        self.__type = SVMType(str(type_))
         self.__signature = signature
         self.__modifiers = modifiers
         self.__annotations = annotations or []
@@ -177,10 +176,10 @@ class SmaliMember:
         return not self.__eq__(__o)
 
     def __hash__(self) -> int:
-        return self.__signature.__hash__()
+        return hash(str(self.type))
 
     def __repr__(self) -> str:
-        return f"<{self.__class__.__name__} '{self.signature}' at {id(self):#x}"
+        return f"<{self.__class__.__name__} '{self.signature}' at {id(self):#x}>"
 
     def __str__(self) -> str:
         return f"<{self.__class__.__name__} {self.signature}>"
@@ -217,12 +216,11 @@ class SmaliAnnotation(SmaliMember):
         parent: SmaliMember,
         signature: str,
         modifiers: int,
-        base_class: type,
         annotations: list = None,
         attr=None,
     ) -> None:
         super().__init__(
-            signature, parent, signature, modifiers, base_class, annotations
+            signature, parent, signature, modifiers, SmaliAnnotation, annotations
         )
         self.attr = attr or {}
 
@@ -342,7 +340,7 @@ class SmaliMethod(SmaliMember):
         annotations: list = None,
     ) -> None:
         super().__init__(
-            signature, parent, signature, modifiers, SmaliMethod, annotations
+            f"{parent.type}->{signature}", parent, signature, modifiers, SmaliMethod, annotations
         )
         self.__vm = vm
         sig_type = self.type.signature
@@ -439,6 +437,7 @@ class _MethodBroker:
 
     def __iadd__(self, method: SmaliMethod) -> "_MethodBroker":
         self.__methods.append(method)
+        return self
 
     def __call__(self, instance, *args, **kwds) -> object:
         if len(self.__methods) == 1:
@@ -634,6 +633,7 @@ class SmaliClass(SmaliMember):
         self.__methods = {}
         self.__super = None
         self.__implements = []
+        self.__classes = {}
 
     @property
     def simple_name(self) -> str:

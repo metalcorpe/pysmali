@@ -108,7 +108,7 @@ class SmaliVM:
     classloader: ClassLoader
     """The class loader used to define classes."""
 
-    debug_handler: DebugHandler
+    debug_handler: DebugHandler = None
     """The debug handler to use."""
 
     executors: dict
@@ -180,6 +180,7 @@ class SmaliVM:
         if mhash not in self.__frames:
             self.__frames[mhash] = frame
             frame.vm = self
+
 
     def get_class(self, name) -> SmaliClass:
         """Searches for a class with the given name.
@@ -333,7 +334,7 @@ class _SourceFieldVisitor(FieldVisitor):
         self.field = field
 
     def visit_annotation(self, access_flags: int, signature: str) -> AnnotationVisitor:
-        annotation = SmaliAnnotation(signature, self.field, signature, access_flags)
+        annotation = SmaliAnnotation(self.field, signature, access_flags)
         self.field.annotations.append(annotation)
         return SmaliVMAnnotationReader(annotation)
 
