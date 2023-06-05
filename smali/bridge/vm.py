@@ -26,7 +26,7 @@ debug-option wihtin the VM object. It is also possible to use a custom
 from abc import ABCMeta, abstractmethod
 
 from smali import SmaliValue, opcode
-from smali.base import Type, AccessType
+from smali.base import AccessType, SVMType
 from smali.reader import SmaliReader
 from smali.visitor import ClassVisitor, MethodVisitor, FieldVisitor, AnnotationVisitor
 from smali.bridge.lang import (
@@ -150,23 +150,23 @@ class SmaliVM:
     def __init__(
         self,
         class_loader: ClassLoader = None,
-        executors: dict = executor.cache,
+        executors: dict = None,
         use_strict: bool = False,
     ) -> None:
         self.classloader = _SmaliClassLoader(self) or class_loader
-        self.executors = executors or {}
+        self.executors = executors or executor.cache
         self.use_strict = use_strict
 
-    def new_class(self, cls: SmaliClass):
+    def new_class(self, __class: SmaliClass):
         """Defines a new class that can be accessed globally.
 
         :param cls: the class to be defined
         :type cls: SmaliClass
         """
-        if not cls:
+        if not __class:
             raise ValueError("SmaliClass object is null!")
 
-        self.__classes[cls.signature] = cls
+        self.__classes[__class.signature] = __class
 
     def new_frame(self, method: SmaliMethod, frame: Frame):
         """Creates a new method frame that will be mapped to the method's signature-
@@ -278,18 +278,18 @@ class SmaliVM:
             )
 
         for param, register in zip(parameters, registers):
-            param_type = Type(param)
+            param_type: SVMType = param
             # Lookup primitive types
             for primitive, ptypes in self.__type_map.items():
-                if param_type.class_name in ptypes:
+                if param_type.full_name in ptypes:
                     if not isinstance(registers[register], primitive):
                         raise TypeError(
                             "Invalid type for parameter, expected %s - got %s"
                             % (param, type(registers[register]))
                         )
 
-            if param_type.descriptor not in self.__classes:
-                raise NoSuchClassError(f'Class "{param_type.descriptor}" not defined!')
+            if param_type.full_name not in self.__classes:
+                raise NoSuchClassError(f'Class "{param_type}" not defined!')
 
         frame.registers.update(registers)
 
@@ -333,7 +333,7 @@ class _SourceFieldVisitor(FieldVisitor):
         self.field = field
 
     def visit_annotation(self, access_flags: int, signature: str) -> AnnotationVisitor:
-        annotation = SmaliAnnotation(self.field, signature, access_flags)
+        annotation = SmaliAnnotation(signature, self.field, signature, access_flags)
         self.field.annotations.append(annotation)
         return SmaliVMAnnotationReader(annotation)
 
@@ -450,11 +450,11 @@ class _SourceClassVisitor(ClassVisitor):
         self, name: str, access_flags: int, field_type: str, value=None
     ) -> FieldVisitor:
         field = SmaliField(
+            field_type,
             self.smali_class,
             f"{name}:{field_type}",
             access_flags,
             name,
-            Type(field_type),
             value=SmaliValue(value) if value else None,
         )
         self.smali_class[name] = field

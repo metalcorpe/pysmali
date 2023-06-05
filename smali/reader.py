@@ -28,7 +28,13 @@ from smali.visitor import (
     AnnotationVisitor,
     MethodVisitor,
 )
-from smali.base import AccessType, Line, Token, Type, SmaliValueProxy
+from smali.base import (
+    AccessType,
+    Line,
+    Token,
+    SmaliValueProxy,
+    SVMType,
+)
 from smali.opcode import RETURN, GOTO
 
 
@@ -534,15 +540,18 @@ class SmaliReader:
             access_flags = AccessType.get_flags(flags)
 
             # We don't need to verify the signature as this is done
-            # in the Type class
-            signature = Type(self.line.peek())
+            # in the SVMType class
+            signature = SVMType(self.line.peek()).signature
+            if not signature:
+                raise SyntaxError(f"Expected a method signature - got {signature}")
+
             m_visitor = EMPTY_METHV
             if self._visitor:
                 m_visitor = self._visitor.visit_method(
-                    signature.get_method_name(),
+                    signature.name,
                     access_flags,
-                    signature.get_method_params(),
-                    signature.get_method_return_type(),
+                    [str(x) for x in signature.parameter_types],
+                    str(signature.return_type),
                 )
 
             # Add the visitor first before publishing the comment
@@ -568,8 +577,6 @@ class SmaliReader:
             flags = self._read_access_flags()
             access_flags = AccessType.get_flags(flags)
 
-            # We don't need to verify the signature as this is done
-            # in the Type class
             descriptor = self.line.peek()
             self._validate_descriptor(descriptor)
 

@@ -5,7 +5,7 @@
 ![Status](https://img.shields.io:/static/v1?label=Status&message=Pre-Release&color=teal)
 ![Platform](https://img.shields.io:/static/v1?label=Platforms&message=Linux|Windows&color=lightgrey)
 [![Build and Deploy Sphinx Documentation](https://github.com/MatrixEditor/pysmali/actions/workflows/sphinx.yml/badge.svg)](https://github.com/MatrixEditor/pysmali/actions/workflows/sphinx.yml)
-![PyPi](https://img.shields.io:/static/v1?label=PyPi&message=0.1.4&color=lightblue)
+![PyPi](https://img.shields.io:/static/v1?label=PyPi&message=0.2.0&color=lightblue)
 
 
 The main functionalities of this repository cover creating and parsing Smali files with Python3 as well as interpret Smali source code files. There is also an interactive interpreter provided that acts as a Python-CLI.
@@ -72,14 +72,14 @@ There are a few options to have in mind when parsing with a `SmaliReader`:
 Actually, the code above does nothing as the `ClassVisitor` class does not handle any notification by the reader. For instance, to print out the class name of a parsed code, the following implementation could be used:
 
 ```python
-from smali import SmaliReader, ClassVisitor, Type
+from smali import SmaliReader, ClassVisitor, SVMType
 
 class NamePrinterVisitor(ClassVisitor):
     def visit_class(self, name: str, access_flags: int) -> None:
         # The provided name is the type descriptor, so we have to
         # convert it:
-        cls_type = Type(name)
-        print('ClassName:', cls_type.class_name)
+        cls_type = SVMType(name)
+        print('Class:', cls_type.pretty_name) # prints: com.example.Hello
 
 reader = SmaliReader()
 reader.visit(".class public final Lcom/example/Hello;", NamePrinterVisitor())

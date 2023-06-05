@@ -23,12 +23,11 @@ from cmd import Cmd
 from smali import (
     AccessType,
     opcode,
-    Type,
     SmaliValue,
     MethodVisitor,
     ClassVisitor,
     FieldVisitor,
-    SmaliReader
+    SmaliReader,
 )
 from smali.bridge import (
     Frame,
@@ -36,16 +35,16 @@ from smali.bridge import (
     SmaliObject,
     SmaliClass,
     SmaliField,
-    SmaliMethod
+    SmaliMethod,
 )
 from smali.bridge.vm import (
     SmaliVMClassReader,
     SmaliVMMethodReader,
     SmaliVMFieldReader,
-    SmaliVM
+    SmaliVM,
 )
 
-SMALI_SCRIPT_SUFFIX = 'ssf'
+SMALI_SCRIPT_SUFFIX = "ssf"
 """File suffix for Smali-Script files"""
 
 
@@ -58,7 +57,7 @@ class DefaultVisitor(MethodVisitor, ClassVisitor):
     cls: SmaliVMClassReader
     """The root class"""
 
-    shell: 'ISmaliShell'
+    shell: "ISmaliShell"
     """The shell reference"""
 
     last_label: str
@@ -66,7 +65,7 @@ class DefaultVisitor(MethodVisitor, ClassVisitor):
 
     importing: bool = False
 
-    def __init__(self, shell: 'ISmaliShell') -> None:
+    def __init__(self, shell: "ISmaliShell") -> None:
         super().__init__(None)
         self.shell = shell
         self.frame = Frame()
@@ -74,10 +73,10 @@ class DefaultVisitor(MethodVisitor, ClassVisitor):
         self.pos = 0
 
         self.frame.vm = shell.emulator
-        self.reset_var('p0', shell.root)
+        self.reset_var("p0", shell.root)
 
     def visit_restart(self, register: str) -> None:
-        if register != 'p0':
+        if register != "p0":
             self.reset_var(register)
         else:
             self.reset_var(register, self.shell.root)
@@ -114,19 +113,26 @@ class DefaultVisitor(MethodVisitor, ClassVisitor):
                 exc(self.frame)
                 self.pos += 1
 
-                if 'return' in value:
+                if "return" in value:
                     print(self.frame.return_value)
                 return
 
         if self.importing:
             self.shell.onecmd(f"{ins_name} {' '.join(args)}")
         else:
-            raise SyntaxError(f'Invalid OpCode: {ins_name}')
+            raise SyntaxError(f"Invalid OpCode: {ins_name}")
 
-    def visit_field(self, name: str, access_flags: int, field_type: str,
-                    value=None) -> FieldVisitor:
-        field = SmaliField(self.shell.root.smali_class, f"{name}:{field_type}", access_flags,
-                           name, Type(field_type), value=SmaliValue(value) if value else None)
+    def visit_field(
+        self, name: str, access_flags: int, field_type: str, value=None
+    ) -> FieldVisitor:
+        field = SmaliField(
+            field_type,
+            self.shell.root.smali_class,
+            f"{name}:{field_type}",
+            access_flags,
+            name,
+            value=SmaliValue(value) if value else None,
+        )
         self.shell.root.smali_class[name] = field
         if access_flags not in AccessType.STATIC and value is not None:
             self.shell.root[name] = value
@@ -141,12 +147,15 @@ class DefaultVisitor(MethodVisitor, ClassVisitor):
 
     def visit_invoke(self, inv_type: str, args: list, owner: str, method: str) -> None:
         if inv_type:
-            self.visit_instruction(f"invoke-{inv_type}", [inv_type, args, owner, method])
+            self.visit_instruction(
+                f"invoke-{inv_type}", [inv_type, args, owner, method]
+            )
         else:
             self.visit_instruction("invoke", [inv_type, args, owner, method])
 
-    def visit_method(self, name: str, access_flags: int, parameters: list,
-                     return_type: str) -> MethodVisitor:
+    def visit_method(
+        self, name: str, access_flags: int, parameters: list, return_type: str
+    ) -> MethodVisitor:
         signature = f"{name}({''.join(parameters)}){return_type}"
         smali_class = self.shell.root.smali_class
 
@@ -156,7 +165,7 @@ class DefaultVisitor(MethodVisitor, ClassVisitor):
         smali_class[name] = method
         return visitor
 
-    def visit_inner_class(self, name: str, access_flags: int) -> 'ClassVisitor':
+    def visit_inner_class(self, name: str, access_flags: int) -> "ClassVisitor":
         if self.importing:
             smali_class = self.shell.root.smali_class
             inner = SmaliClass(smali_class, name, access_flags)
@@ -168,10 +177,10 @@ class DefaultVisitor(MethodVisitor, ClassVisitor):
 class ISmaliShell(Cmd):
     """Implementation of an interactive Smali-Interpreter."""
 
-    DEFAULT_PROMPT = '>>> '
+    DEFAULT_PROMPT = ">>> "
     """The default prompt"""
 
-    INLINE_PROMPT = '... '
+    INLINE_PROMPT = "... "
     """Prompt used for field and method definitions"""
 
     visitor: DefaultVisitor
@@ -186,7 +195,7 @@ class ISmaliShell(Cmd):
     root: SmaliObject
     """The base context used to define fields and methods."""
 
-    prompt: str = '>>> '
+    prompt: str = ">>> "
     """The prompt used by ``cmd.Cmd``"""
 
     check_import: bool = True
@@ -220,12 +229,12 @@ class ISmaliShell(Cmd):
         if path in self.__imported_files and self.check_import:
             return
 
-        if not path.endswith(('.smali', f".{SMALI_SCRIPT_SUFFIX}")):
+        if not path.endswith((".smali", f".{SMALI_SCRIPT_SUFFIX}")):
             print(f"! Unknown file format (unknown suffix) at '{path}'")
             return
 
         cls = None
-        with open(path, 'r', encoding='utf-8') as source:
+        with open(path, "r", encoding="utf-8") as source:
             self.__imported_files.append(path)
             if path.endswith(f".{SMALI_SCRIPT_SUFFIX}"):
                 self.visitor.importing = True
@@ -234,11 +243,10 @@ class ISmaliShell(Cmd):
             else:
                 cls = self.emulator.classloader.load_class(source, init=False)
 
-
         try:
             if cls is not None:
                 cls.clinit()
-        except Exception: # :noqa
+        except Exception:  # :noqa
             print(traceback.format_exc())
 
     def do_vars(self, _):
@@ -268,8 +276,8 @@ class ISmaliShell(Cmd):
         Deletes the variable at the specified register. The root
         context at 'p0' can't be deleted.
         """
-        if register == 'p0':
-            print('! Attempted to delete root-context - skipping...\n')
+        if register == "p0":
+            print("! Attempted to delete root-context - skipping...\n")
             return
 
         if register in self.visitor.frame.registers:
@@ -279,7 +287,7 @@ class ISmaliShell(Cmd):
     def precmd(self, line: str):
         if len(line) == 0:
             self.change_prompt(ISmaliShell.DEFAULT_PROMPT)
-            return 'EOF'
+            return "EOF"
 
         return line
 
@@ -289,7 +297,7 @@ class ISmaliShell(Cmd):
         :param line: the input line
         :type line: str
         """
-        if line == 'EOF':
+        if line == "EOF":
             return
 
         if isinstance(self.visitor, DefaultVisitor):
@@ -308,7 +316,7 @@ class ISmaliShell(Cmd):
 
     def do_copyright(self, _):
         """Prints copyright information"""
-        print('Copyright (C) 2023 MatrixEditor')
+        print("Copyright (C) 2023 MatrixEditor")
 
     def change_prompt(self, new_prompt: str):
         """Changes the prompt (for later usage)"""
