@@ -425,7 +425,7 @@ class Type:
         :rtype: list
         """
         start = self.__signature.find("(")
-        end = self.__signature.find(")") + 1
+        end = self.__signature.find(")") # we don't want the closing brace
         if start == -1 or end == -1:
             raise TypeError("Invalid method signature")
 
@@ -443,11 +443,14 @@ class Type:
                 is_type_def = True
                 continue
 
+            if char == ";":
+                # This check has to be made before validating whether
+                # the current param is a custom type, otherwise the
+                # whole string would be returned. See issue #3
+                is_type_def = False
+
             if char == "[" or is_type_def:
                 continue
-
-            if char == ";":
-                is_type_def = False
 
             param_list.append(current_param)
             current_param = ""
