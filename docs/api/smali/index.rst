@@ -89,15 +89,31 @@ as well as class names:
 .. code-block:: python
     :linenos:
 
-    from smali import SVMType
+    from smali import SVMType, Signature
 
-    car_type = SVMType("com.example.car")
-    # Type descriptor => Lcom/example/car;
-    descriptor = str(car_type)
-    # Original class name => com.example.car
-    name = car_type.simple_name
-    # Internal name => com/example/car
-    internal = car_type.dvm_name
+    # simple type instance
+    t = SVMType("Lcom/example/Class;")
+    t.simple_name # Class
+    t.pretty_name # com.example.Class
+    t.dvm_name # com/example/Class
+    t.full_name # Lcom/example/Class;
+    t.svm_type # SVMType.TYPES.CLASS
+
+    # create new type instance for method signature
+    m = SVMType("getName([BLjava/lang/String;)Ljava/lang/String;")
+    m.svm_type # SVMType.TYPES.METHOD
+    # retrieve signature instance
+    s = m.signature or Signature(m)
+    s.return_type # SVMType("Ljava/lang/String;")
+    s.parameter_types # [SVMType("[B"), SVMType("Ljava/lang/String;")]
+    s.name # getName
+    s.declaring_class # would return the class before '->' (only if defined)
+
+    # array types
+    array = SVMType("[B")
+    array.svm_type # SVMType.TYPES.ARRAY
+    array.array_type # SVMType("B")
+    array.dim # 1 (one dimension)
 
 As an input can be used anything that represents the class as type descriptor, original
 class name or internal name (array types are supported as well).

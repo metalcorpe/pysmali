@@ -28,7 +28,7 @@ __all__ = [
     "Token",
     "Line",
     "smali_value",
-    "SmaliValueProxy",
+    "is_type_descriptor",
     "Signature",
     "SVMType",
 ]
@@ -507,6 +507,9 @@ class Signature:
     def __str__(self) -> str:
         return self.sig
 
+    def __repr__(self) -> str:
+        return f"Signature(\"{self.__signature}\")"
+
 
 class SVMType:
     class TYPES(Enum):
@@ -555,6 +558,9 @@ class SVMType:
 
     def __str__(self) -> str:
         return self.__type
+
+    def __repr__(self) -> str:
+        return f"SVMType(\"{self.__type}\")"
 
     def is_signature(self) -> bool:
         """Returns whether this type instance is a method signature.
@@ -658,208 +664,92 @@ class SVMType:
         return self.pretty_name.split(".")[-1]
 
 
-def smali_value(value: str) -> "SmaliValueProxy":
+def smali_value(value: str) -> int | float | str | SVMType | bool:
     """Parses the given string and returns its Smali value representation.
 
     :param value: the value as a string
     :type value: str
     :raises ValueError: if it has no valid Smali type
     :return: the Smali value representation
-    :rtype: SmaliValueProxy
+    :rtype: int | float | str | SVMType | bool
     """
-    sm_value = SmaliValueProxy()
-    sm_value.value = value
-    sm_value.actual_value = None
-    for i, entry in enumerate(SmaliValueProxy.TYPE_MAP):
+    actual_value = None
+    for i, entry in enumerate(TYPE_MAP):
         matcher, wrapper = entry
-        if matcher.match(sm_value.value):
+        if matcher.match(value):
             if i <= 3:  # hex value possible
-                hex_val = SmaliValueProxy.RE_HEX_VALUE.match(value) is not None
+                hex_val = RE_HEX_VALUE.match(value) is not None
                 if not hex_val:
-                    sm_value.actual_value = wrapper(value)
+                    actual_value = wrapper(value)
                 else:
-                    sm_value.actual_value = wrapper(value, base=16)
+                    actual_value = wrapper(value, base=16)
             else:
-                sm_value.actual_value = wrapper(value)
+                actual_value = wrapper(value)
             break
 
     # Handling of null values is not implemented yet
-    if sm_value.actual_value is None:
+    if actual_value is None:
         raise ValueError(f"Could not find any matching primitive type for {value}")
 
-    sm_locals = {}
-    for key in __smali_builtins__:
-        if hasattr(sm_value.actual_value, key):
-            sm_locals[key] = getattr(sm_value.actual_value, key)
+    return actual_value
 
-    vars(sm_value).update(sm_locals)
-    return sm_value
+RE_INT_VALUE = re.compile(r"[\-\+]?(0x)?[\dabcdefABCDEF]+$")
+"""Pattern for ``int`` values."""
 
+RE_BYTE_VALUE = re.compile(r"[\-\+]?(0x)?[\dabcdefABCDEF]+t$")
+"""Pattern for ``byte`` values."""
 
-class SmaliValueProxy:
-    """Wrapper class for primitives in Smali.
+RE_SHORT_VALUE = re.compile(r"[\-\+]?(0x)?[\dabcdefABCDEF]+s$")
+"""Pattern for ``short`` values."""
 
-    Use this class to retrieve the actual primitiva value for a parsed
-    source code snippet. As this class overrides most of the internal
-    special functions, objects of this class can be used as regualar
-    strings or numeric values:
+RE_FLOAT_VALUE = re.compile(r"[\-\+]?\d+\.\d+f$")
+"""Pattern for ``float`` values."""
 
-    >>> value = SmaliValue("1234")
-    1234
-    >>> value += 1
-    1235
+RE_DOUBLE_VALUE = re.compile(r"[\-\+]?\d+\.\d+")
+"""Pattern for ``double`` values."""
 
-    The same behaviour applies to parsed strings (note that you need
-    quotation marks):
+RE_LONG_VALUE = re.compile(r"[\-\+]?(0x)?[\dabcdefABCDEF]+l$")
+"""Pattern for ``long`` values."""
 
-    >>> string = SmaliValue('"Hello World"')
-    'Hello World'
-    >>> len(string)
-    11
-    """
+RE_CHAR_VALUE = re.compile(r"^'.*'$")
+"""Pattern for ``char`` values."""
 
-    RE_INT_VALUE = re.compile(r"[\-\+]?(0x)?[\dabcdefABCDEF]+$")
-    """Pattern for ``int`` values."""
+RE_STRING_VALUE = re.compile(r'^".*"$')
+"""Pattern for ``String`` values."""
 
-    RE_BYTE_VALUE = re.compile(r"[\-\+]?(0x)?[\dabcdefABCDEF]+t$")
-    """Pattern for ``byte`` values."""
+RE_TYPE_VALUE = re.compile(r"\[*((L\S*;$)|([ZCBSIFVJD])$)")  # NOQA
+"""Pattern for type descriptors."""
 
-    RE_SHORT_VALUE = re.compile(r"[\-\+]?(0x)?[\dabcdefABCDEF]+s$")
-    """Pattern for ``short`` values."""
+RE_BOOL_VALUE = re.compile(r"true|false")
+"""Pattern for ``boolean`` values."""
 
-    RE_FLOAT_VALUE = re.compile(r"[\-\+]?\d+\.\d+f$")
-    """Pattern for ``float`` values."""
+RE_HEX_VALUE = re.compile(r"0x[\dabcdefABCDEF]+")
+"""Pattern for integer values."""
 
-    RE_DOUBLE_VALUE = re.compile(r"[\-\+]?\d+\.\d+")
-    """Pattern for ``double`` values."""
-
-    RE_LONG_VALUE = re.compile(r"[\-\+]?(0x)?[\dabcdefABCDEF]+l$")
-    """Pattern for ``long`` values."""
-
-    RE_CHAR_VALUE = re.compile(r"^'.*'$")
-    """Pattern for ``char`` values."""
-
-    RE_STRING_VALUE = re.compile(r'^".*"$')
-    """Pattern for ``String`` values."""
-
-    RE_TYPE_VALUE = re.compile(r"\[*((L\S*;$)|([ZCBSIFVJD])$)")  # NOQA
-    """Pattern for type descriptors."""
-
-    RE_BOOL_VALUE = re.compile(r"true|false")
-    """Pattern for ``boolean`` values."""
-
-    RE_HEX_VALUE = re.compile(r"0x[\dabcdefABCDEF]+")
-    """Pattern for integer values."""
-
-    TYPE_MAP: list = [
-        (RE_SHORT_VALUE, lambda x, **kw: int(x[:-1], **kw)),
-        (RE_LONG_VALUE, lambda x, **kw: int(x[:-1], **kw)),
-        (RE_BYTE_VALUE, lambda x, **kw: int(x[:-1], **kw)),
-        (RE_INT_VALUE, int),
-        (RE_BOOL_VALUE, lambda x: str(x).lower() == "true"),
-        (RE_FLOAT_VALUE, lambda x: float(x[:-1])),
-        (RE_DOUBLE_VALUE, lambda x: float(x[:-1])),
-        (RE_CHAR_VALUE, lambda x: str(x[1:-1])),
-        (RE_STRING_VALUE, lambda x: str(x[1:-1])),
-        (RE_TYPE_VALUE, SVMType),
-    ]
-    """Defines custom handlers for actual value defintions
-
-    :meta private:
-    """
-
-    value: str
-    """The initial source code value (string)"""
-
-    actual_value = None
-    """The actual value of any type"""
-
-    @staticmethod
-    def is_type_descriptor(value: str) -> bool:
-        """Returns whether the given value is a valid type descriptor.
-
-        :param value: the value to check
-        :type value: str
-        :return: True, if the value is a valid type descriptor
-        :rtype: bool
-        """
-        return SmaliValueProxy.RE_TYPE_VALUE.match(value) is not None
-
-
-####################################################################################
-# INTERNAL
-####################################################################################
-__smali_builtins__ = [
-    "__contains__", "__eq__", "__ne__", "__len__", "__str__", "__next__", "__bool__",
-    "__repr__", "__str__", "__bytes__", "__format__", "__lt__", "__le__", "__eq__",
-    "__ne__", "__gt__", "__ge__", "__hash__", "__bool__", "__len__", "__length_hint__",
-    "__getitem__", "__setitem__", "__delitem__", "__missing__", "__iter__", "__reversed__",
-    "__contains__", "__add__", "__sub__", "__mul__", "__truediv__", "__floordiv__",
-    "__mod__", "__divmod__", "__lshift__", "__rshift__", "__and__", "__xor__", "__or__",
-    "__radd__", "__rsub__", "__rmul__", "__rtruediv__", "__rfloordiv__", "__rmod__",
-    "__rdivmod__", "__rlshift__", "__rrshift__", "__rand__", "__rxor__", "__ror__",
-    "__neg__", "__pos__", "__abs__", "__invert__", "__complex__", "__int__", "__float__",
-    "__index__", "__trunc__", "__floor__", "__ceil__",
+TYPE_MAP: list = [
+    (RE_SHORT_VALUE, lambda x, **kw: int(x[:-1], **kw)),
+    (RE_LONG_VALUE, lambda x, **kw: int(x[:-1], **kw)),
+    (RE_BYTE_VALUE, lambda x, **kw: int(x[:-1], **kw)),
+    (RE_INT_VALUE, int),
+    (RE_BOOL_VALUE, lambda x: str(x).lower() == "true"),
+    (RE_FLOAT_VALUE, lambda x: float(x[:-1])),
+    (RE_DOUBLE_VALUE, lambda x: float(x[:-1])),
+    (RE_CHAR_VALUE, lambda x: str(x[1:-1])),
+    (RE_STRING_VALUE, lambda x: str(x[1:-1])),
+    (RE_TYPE_VALUE, SVMType),
 ]
+"""Defines custom handlers for actual value defintions
 
-__smali_specials__ = [
-    ("__iadd__", lambda x, y: x.actual_value + y.actual_value),
-    ("__isub__", lambda x, y: x.actual_value - y.actual_value),
-    ("__imul__", lambda x, y: x.actual_value * y.actual_value),
-    ("__itruediv__", lambda x, y: x.actual_value / y.actual_value),
-    ("__ifloordiv__", lambda x, y: x.actual_value // y.actual_value),
-    ("__imod__", lambda x, y: x.actual_value % y.actual_value),
-    ("__ilshift__", lambda x, y: x.actual_value << y.actual_value),
-    ("__irshift__", lambda x, y: x.actual_value >> y.actual_value),
-    ("__iand__", lambda x, y: x.actual_value & y.actual_value),
-    ("__ixor__", lambda x, y: x.actual_value ^ y.actual_value),
-    ("__ior__", lambda x, y: x.actual_value | y.actual_value),
-]
+:meta private:
+"""
 
+def is_type_descriptor(value: str) -> bool:
+    """Returns whether the given value is a valid type descriptor.
 
-def __wrap_args__(self, target: str, *args):
-    """Tries to wrap ``SmalivalueProxy`` objects before calling the special method.
-
-    :param target: the method to call
-    :type target: str
+    :param value: the value to check
+    :type value: str
+    :return: True, if the value is a valid type descriptor
+    :rtype: bool
     """
-    if len(args) == 0:
-        return self.__dict__[target](*args)
+    return RE_TYPE_VALUE.match(value) is not None
 
-    new_args = []
-    for val in args:
-        # Built-in types will throw errors when using executing
-        # SmaliValueProxy * SmaliValueProxy, so we have to convert
-        # the proxy argument by using the actual value
-        if isinstance(val, SmaliValueProxy):
-            new_args.append(val.actual_value)
-        else:
-            new_args.append(val)
-
-    return self.__dict__[target](*new_args)
-
-
-for method in __smali_builtins__:
-    setattr(
-        SmaliValueProxy,
-        method,
-        lambda self, *args, method=method: __wrap_args__(self, method, *args),
-    )
-
-
-def __wrap_special__(instance, actual_val, val, funct):
-    funct(actual_val, val)
-    return instance
-
-
-for method, func in __smali_specials__:
-    setattr(
-        SmaliValueProxy,
-        method,
-        lambda self, val, func=func: __wrap_special__(
-            self, self.actual_value, val, func
-        ),
-    )
-
-del method
-del func

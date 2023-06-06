@@ -24,6 +24,8 @@ $ pip install pysmali
 
 For a more detailed explanation of the Smali Visitor-API use the [Github-Pages Docs](https://matrixeditor.github.io/pysmali/).
 
+> **Info**: Make sure you are using ``pysmali>=0.2.0`` as it introduces a user-friendly type system to mitigate possible issues from parsing type descriptors.
+
 ### ISmali (Interactive Smali Interpreter)
 
 As of version `0.1.2` the interactive interpreter can be used to execute Smali code directly:
@@ -125,12 +127,10 @@ As of version `0.1.2` you can import Smali files and execute defined methods:
 ```python
 from smali.bridge import SmaliVM, SmaliObject
 
-with open('example.smali', 'r', encoding='utf-8') as fp:
-    source = fp.read()
-
 vm = SmaliVM()
 # Import class definition
-smali_class = vm.classloader.load_class(source, init=False)
+with open('example.smali', 'r', encoding='utf-8') as fp:
+    smali_class = vm.classloader.load_class(fp, init=False)
 # Call <clinit> method
 smali_class.clinit()
 

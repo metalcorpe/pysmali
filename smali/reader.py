@@ -32,8 +32,9 @@ from smali.base import (
     AccessType,
     Line,
     Token,
-    SmaliValueProxy,
     SVMType,
+    smali_value,
+    is_type_descriptor
 )
 from smali.opcode import RETURN, GOTO
 
@@ -240,7 +241,7 @@ class SmaliReader:
         if not self.validate:
             return
 
-        if not SmaliValueProxy.is_type_descriptor(name):
+        if not is_type_descriptor(name):
             raise SyntaxError(f"Expected type descriptor - got '{name}'")
 
     def _publish_comment(self) -> None:
@@ -444,7 +445,7 @@ class SmaliReader:
             self._validate_token(token, Token.SUPER)
 
             super_class = self.line.peek()
-            if not SmaliValueProxy.is_type_descriptor(super_class):
+            if not is_type_descriptor(super_class):
                 raise SyntaxError(
                     f"Expected super-class type descriptor - got '{super_class}'"
                 )
@@ -896,7 +897,7 @@ class SmaliReader:
                 self._copy_line()
             if value[0] == "." and value[1:] == Token.END.value:
                 break
-            values.append(value)
+            values.append(smali_value(value))
 
         if self._visitor and self._visitor != EMPTY_METHV:
             self._visitor.visit_array_data(length, values)
