@@ -28,7 +28,14 @@ from smali.visitor import (
     AnnotationVisitor,
     MethodVisitor,
 )
-from smali.base import AccessType, Line, Token, Type, SmaliValueProxy
+from smali.base import (
+    AccessType,
+    Line,
+    Token,
+    SVMType,
+    smali_value,
+    is_type_descriptor
+)
 from smali.opcode import RETURN, GOTO
 
 
@@ -234,7 +241,7 @@ class SmaliReader:
         if not self.validate:
             return
 
-        if not SmaliValueProxy.is_type_descriptor(name):
+        if not is_type_descriptor(name):
             raise SyntaxError(f"Expected type descriptor - got '{name}'")
 
     def _publish_comment(self) -> None:
@@ -438,7 +445,7 @@ class SmaliReader:
             self._validate_token(token, Token.SUPER)
 
             super_class = self.line.peek()
-            if not SmaliValueProxy.is_type_descriptor(super_class):
+            if not is_type_descriptor(super_class):
                 raise SyntaxError(
                     f"Expected super-class type descriptor - got '{super_class}'"
                 )
@@ -534,15 +541,18 @@ class SmaliReader:
             access_flags = AccessType.get_flags(flags)
 
             # We don't need to verify the signature as this is done
-            # in the Type class
-            signature = Type(self.line.peek())
+            # in the SVMType class
+            signature = SVMType(self.line.peek()).signature
+            if not signature:
+                raise SyntaxError(f"Expected a method signature - got {signature}")
+
             m_visitor = EMPTY_METHV
             if self._visitor:
                 m_visitor = self._visitor.visit_method(
-                    signature.get_method_name(),
+                    signature.name,
                     access_flags,
-                    signature.get_method_params(),
-                    signature.get_method_return_type(),
+                    [str(x) for x in signature.parameter_types],
+                    str(signature.return_type),
                 )
 
             # Add the visitor first before publishing the comment
@@ -568,8 +578,6 @@ class SmaliReader:
             flags = self._read_access_flags()
             access_flags = AccessType.get_flags(flags)
 
-            # We don't need to verify the signature as this is done
-            # in the Type class
             descriptor = self.line.peek()
             self._validate_descriptor(descriptor)
 
@@ -889,7 +897,7 @@ class SmaliReader:
                 self._copy_line()
             if value[0] == "." and value[1:] == Token.END.value:
                 break
-            values.append(value)
+            values.append(smali_value(value))
 
         if self._visitor and self._visitor != EMPTY_METHV:
             self._visitor.visit_array_data(length, values)

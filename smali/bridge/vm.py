@@ -13,6 +13,8 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+from __future__ import annotations
+
 __doc__ = """
 Implementation of a simple Smali emulator named *SmaliVM*. It supports
 execution of small code snippets as well as the execution of whole
@@ -23,10 +25,11 @@ debug-option wihtin the VM object. It is also possible to use a custom
 ``ClassLoader`` to load or define new classes.
 """
 
+from io import IOBase
 from abc import ABCMeta, abstractmethod
 
 from smali import SmaliValue, opcode
-from smali.base import Type, AccessType
+from smali.base import AccessType, SVMType
 from smali.reader import SmaliReader
 from smali.visitor import ClassVisitor, MethodVisitor, FieldVisitor, AnnotationVisitor
 from smali.bridge.lang import (
@@ -61,7 +64,7 @@ class ClassLoader(metaclass=ABCMeta):
     """Abstract base class for SmaliClassLoader"""
 
     @abstractmethod
-    def define_class(self, source: bytes) -> SmaliClass:
+    def define_class(self, source: bytes | str | IOBase) -> SmaliClass:
         """Defines a new SmaliClass by parsing the given source file.
 
         :param source: the source code
@@ -71,11 +74,11 @@ class ClassLoader(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def load_class(self, source: str, init=True, lookup_missing=False) -> SmaliClass:
+    def load_class(self, source: str | bytes | IOBase, init=True, lookup_missing=False) -> SmaliClass:
         """Parses the given source code and initializes the given class if enabled.
 
         :param source: the source code
-        :type source: str | bytes
+        :type source: str | bytes | IOBase
         :param init: whether ``<clinit>`` should be executed, defaults to True
         :type init: bool, optional
         :param lookup_missing: whether missing classes should be searched before parsing
@@ -111,19 +114,19 @@ class SmaliVM:
     debug_handler: DebugHandler
     """The debug handler to use."""
 
-    executors: dict
+    executors: dict[str, executor.Executor]
     """External executors used to operate on a single opcode."""
 
     use_strict: bool = False
     """Tells the VM to throw exceptions on unkown opcodes."""
 
-    __classes: dict = {}
+    __classes: dict[str, SmaliClass] = {}
     """All classes are stored in a dict
 
     :meta public:
     """
 
-    __frames: dict = {}
+    __frames: dict[int, Frame] = {}
     """Stores all execution frames mapped to their method object
 
     :meta public:
@@ -150,23 +153,24 @@ class SmaliVM:
     def __init__(
         self,
         class_loader: ClassLoader = None,
-        executors: dict = executor.cache,
+        executors: dict = None,
         use_strict: bool = False,
     ) -> None:
         self.classloader = _SmaliClassLoader(self) or class_loader
-        self.executors = executors or {}
+        self.executors = executors or executor.cache
         self.use_strict = use_strict
+        self.debug_handler = None
 
-    def new_class(self, cls: SmaliClass):
+    def new_class(self, __class: SmaliClass):
         """Defines a new class that can be accessed globally.
 
         :param cls: the class to be defined
         :type cls: SmaliClass
         """
-        if not cls:
+        if not __class:
             raise ValueError("SmaliClass object is null!")
 
-        self.__classes[cls.signature] = cls
+        self.__classes[__class.signature] = __class
 
     def new_frame(self, method: SmaliMethod, frame: Frame):
         """Creates a new method frame that will be mapped to the method's signature-
@@ -181,7 +185,8 @@ class SmaliVM:
             self.__frames[mhash] = frame
             frame.vm = self
 
-    def get_class(self, name) -> SmaliClass:
+
+    def get_class(self, name: str) -> SmaliClass:
         """Searches for a class with the given name.
 
         :param name: the class name
@@ -195,7 +200,7 @@ class SmaliVM:
 
         return self.__classes[name]
 
-    def call(self, method, instance, *args, **kwargs) -> object:
+    def call(self, method: SmaliMethod, instance, *args, **kwargs) -> object:
         """Executes the given method in the given object instance.
 
         Before the method will be executed, there is an input parameter
@@ -259,7 +264,7 @@ class SmaliVM:
         frame.reset()
         return value
 
-    def _validate_call(self, method, frame: Frame, args: tuple, kwargs: dict):
+    def _validate_call(self, method: SmaliMethod, frame: Frame, args: tuple, kwargs: dict):
         parameters = method.parameters
 
         registers = {}
@@ -278,18 +283,18 @@ class SmaliVM:
             )
 
         for param, register in zip(parameters, registers):
-            param_type = Type(param)
+            param_type: SVMType = param
             # Lookup primitive types
             for primitive, ptypes in self.__type_map.items():
-                if param_type.class_name in ptypes:
+                if param_type.full_name in ptypes:
                     if not isinstance(registers[register], primitive):
                         raise TypeError(
                             "Invalid type for parameter, expected %s - got %s"
                             % (param, type(registers[register]))
                         )
 
-            if param_type.descriptor not in self.__classes:
-                raise NoSuchClassError(f'Class "{param_type.descriptor}" not defined!')
+            if param_type.full_name not in self.__classes:
+                raise NoSuchClassError(f'Class "{param_type}" not defined!')
 
         frame.registers.update(registers)
 
@@ -450,11 +455,11 @@ class _SourceClassVisitor(ClassVisitor):
         self, name: str, access_flags: int, field_type: str, value=None
     ) -> FieldVisitor:
         field = SmaliField(
+            field_type,
             self.smali_class,
             f"{name}:{field_type}",
             access_flags,
             name,
-            Type(field_type),
             value=SmaliValue(value) if value else None,
         )
         self.smali_class[name] = field
@@ -471,10 +476,10 @@ class _SourceClassVisitor(ClassVisitor):
         return visitor
 
     def visit_implements(self, interface: str) -> None:
-        self.smali_class.interfaces.append(interface)
+        self.smali_class.interfaces.append(SVMType(interface))
 
     def visit_super(self, super_class: str) -> None:
-        self.smali_class.super_cls = super_class
+        self.smali_class.super_cls = SVMType(super_class)
 
 
 class _SmaliClassLoader(ClassLoader):

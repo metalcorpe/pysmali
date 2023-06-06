@@ -13,6 +13,8 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+from __future__ import annotations
+
 __doc__ = """
 The module ``lang`` of the provided Smali bridge defines classes that
 can be used to mimic Java's reflection at runtime of the :class:`SmaliVM`.
@@ -33,7 +35,7 @@ import re
 
 from io import UnsupportedOperation
 
-from smali.base import AccessType, SmaliValueProxy, Type
+from smali.base import AccessType, SVMType, Signature
 from smali.bridge.errors import NoSuchMethodError, NoSuchFieldError, NoSuchClassError
 
 __all__ = [
@@ -59,6 +61,8 @@ class SmaliMember:
     __signature: str
     """The qualified signature of this member"""
 
+    __type: SVMType
+
     __modifiers: int
     """The member's visibility modifiers."""
 
@@ -72,12 +76,14 @@ class SmaliMember:
 
     def __init__(
         self,
+        type_: str,
         parent: "SmaliMember",
         signature: str,
         modifiers: int,
         base_class: type,
         annotations: list = None,
     ) -> None:
+        self.__type = SVMType(str(type_))
         self.__signature = signature
         self.__modifiers = modifiers
         self.__annotations = annotations or []
@@ -96,8 +102,8 @@ class SmaliMember:
         :return: True, if present; False otherwise
         :rtype: bool
         """
-        if isinstance(a_type, Type):
-            a_type = a_type.descriptor
+        if isinstance(a_type, SVMType):
+            a_type = str(a_type)
 
         return isinstance(a_type, str) and a_type in self.__annotations
 
@@ -105,12 +111,12 @@ class SmaliMember:
         """Returns all declared annnotations of the given type.
 
         :param a_type: the annotation's type descriptor
-        :type a_type: str | Type
+        :type a_type: str | SVMType
         :return: a list of declared annotations
         :rtype: list
         """
-        if isinstance(a_type, Type):
-            a_type = a_type.descriptor
+        if isinstance(a_type, SVMType):
+            a_type = str(a_type)
 
         if not isinstance(a_type, str):
             # to prevent errors, the output is non-null
@@ -154,6 +160,15 @@ class SmaliMember:
         """
         return self.__annotations
 
+    @property
+    def type(self) -> SVMType:
+        """Returns the type of this member
+
+        :return: the type instance
+        :rtype: :class:`SVMType`
+        """
+        return self.__type
+
     def __eq__(self, __o: object) -> bool:
         if isinstance(__o, self.__class__):
             return __o.signature == self.__signature
@@ -163,10 +178,10 @@ class SmaliMember:
         return not self.__eq__(__o)
 
     def __hash__(self) -> int:
-        return self.__signature.__hash__()
+        return hash(str(self.type))
 
     def __repr__(self) -> str:
-        return f"<{self.__class__.__name__} '{self.signature}' at {id(self):#x}"
+        return f"<{self.__class__.__name__} '{self.signature}' at {id(self):#x}>"
 
     def __str__(self) -> str:
         return f"<{self.__class__.__name__} {self.signature}>"
@@ -200,13 +215,15 @@ class SmaliAnnotation(SmaliMember):
 
     def __init__(
         self,
-        parent,
+        parent: SmaliMember,
         signature: str,
         modifiers: int,
         annotations: list = None,
-        attr: dict = None,
+        attr=None,
     ) -> None:
-        super().__init__(parent, signature, modifiers, SmaliAnnotation, annotations)
+        super().__init__(
+            signature, parent, signature, modifiers, SmaliAnnotation, annotations
+        )
         self.attr = attr or {}
 
     def __getitem__(self, key: str) -> object:
@@ -229,60 +246,47 @@ class SmaliField(SmaliMember):
     :param annotations: the field's annotations, defaults to None
     :type annotations: list, optional
     :param value: the field's value, defaults to None
-    :type value: :class:`SmaliValueProxy`, optional
+    :type value: int | float | str | SVMType | bool, optional
     """
 
     __name: str
     """The field's name"""
 
-    __smali_type: Type
-    """The field's type (Smali type descriptor)"""
-
-    __value: SmaliValueProxy
+    __value: int | float | str | SVMType | bool
     """Stores the actual value of this field"""
 
     def __init__(
         self,
+        _type: str,
         parent,
         signature: str,
         modifiers: int,
         name: str,
-        smali_type: Type,
         annotations: list = None,
-        value: SmaliValueProxy = None,
+        value=None,
     ) -> None:
-        super().__init__(parent, signature, modifiers, SmaliField, annotations)
+        super().__init__(_type, parent, signature, modifiers, SmaliField, annotations)
         self.__value = value
-        self.__smali_type = smali_type
         self.__name = name
 
     @property
-    def value(self) -> SmaliValueProxy:
+    def value(self) -> int | float | str | SVMType | bool:
         """Returns the value of this field.
 
         :return: the value as a :class:`SmaliValue`
-        :rtype: :class:`SmaliValueProxy`
+        :rtype: int | float | str | SVMType | bool
         """
         return self.__value
 
     @value.setter
-    def value(self, new_value: SmaliValueProxy):
+    def value(self, new_value: int | float | str | SVMType | bool):
         """Setter for ``self.value``.
 
         :param new_value: the new value to apply
-        :type new_value: :class:`SmaliValueProxy`
+        :type new_value: int | float | str | SVMType | bool
         :raises UnsupportedOperation: if this field can not be modified
         """
         self.__value = new_value
-
-    @property
-    def smali_type(self) -> Type:
-        """Returns the type of this field
-
-        :return: the type object
-        :rtype: Type
-        """
-        return self.__smali_type
 
     @property
     def name(self) -> str:
@@ -315,9 +319,9 @@ class SmaliMethod(SmaliMember):
     """
 
     __smali_params: list = []
-    """The smali parameter types (type descriptor strings)"""
+    """The smali parameter types (:class:`SVMType`)"""
 
-    __smali_return: Type
+    __smali_return: SVMType
     """The return type"""
 
     __name: str
@@ -337,12 +341,21 @@ class SmaliMethod(SmaliMember):
         modifiers: int,
         annotations: list = None,
     ) -> None:
-        super().__init__(parent, signature, modifiers, SmaliMethod, annotations)
+        super().__init__(
+            f"{parent.type}->{signature}",
+            parent,
+            signature,
+            modifiers,
+            SmaliMethod,
+            annotations,
+        )
         self.__vm = vm
-        sig_type = Type(signature)
-        self.name = sig_type.get_method_name()
-        self.smali_params = sig_type.get_method_params()
-        self.smali_return = sig_type.get_method_return_type()
+        sig_type = self.type.signature
+        if not sig_type:
+            raise ValueError(f"Expected a method signature - got {self.type}")
+        self.name = sig_type.name
+        self.smali_params = sig_type.parameter_types
+        self.smali_return = sig_type.return_type
 
     def __call__(self, instance, *args, **kwds) -> object:
         if not self.__vm:
@@ -368,7 +381,7 @@ class SmaliMethod(SmaliMember):
         self.__name = value
 
     @property
-    def parameters(self) -> list:
+    def parameters(self) -> list[SVMType]:
         """Returns the parameters of this method as type descriptor strings
 
         :return: the parameters of this method
@@ -377,11 +390,11 @@ class SmaliMethod(SmaliMember):
         return self.__smali_params
 
     @property
-    def return_type(self) -> Type:
+    def return_type(self) -> SVMType:
         """Returns the method's return type
 
         :return: the return type
-        :rtype: Type
+        :rtype: SVMType
         """
         return self.__smali_return
 
@@ -422,7 +435,7 @@ class _MethodBroker:
     __name: str
     """The method's name"""
 
-    __methods: list
+    __methods: list[SmaliMethod]
     """The methods that can be called."""
 
     def __init__(self, name: str, methods: list) -> None:
@@ -431,6 +444,7 @@ class _MethodBroker:
 
     def __iadd__(self, method: SmaliMethod) -> "_MethodBroker":
         self.__methods.append(method)
+        return self
 
     def __call__(self, instance, *args, **kwds) -> object:
         if len(self.__methods) == 1:
@@ -462,11 +476,11 @@ class _MethodBroker:
                 # Filter by return type
                 if not returns:
                     targets = list(
-                        filter(lambda x: (x.return_type.descriptor != "V"), targets)
+                        filter(lambda x: (str(x.return_type) != "V"), targets)
                     )
                 else:
                     targets = list(
-                        filter(lambda x: (x.return_type.descriptor == "V"), targets)
+                        filter(lambda x: (str(x.return_type) == "V"), targets)
                     )
 
                 # We found one method, call it!
@@ -497,6 +511,9 @@ class _MethodBroker:
 
     def __iter__(self):
         return iter(self.__methods)
+
+    def __getitem__(self, idx):
+        return self.__methods[idx]
 
 
 SmaliMethodBroker = _MethodBroker
@@ -592,22 +609,22 @@ class SmaliClass(SmaliMember):
     __name: str
     """The full name of this class with dots (``.``)"""
 
-    __methods: dict
+    __methods: dict[str, _MethodBroker]
     """All methods that can be executed are stored in a separate dict.
 
     The values are instances of ``_Methodbroker``.
     """
 
-    __fields: dict
+    __fields: dict[str, SmaliField]
     """All fields if this class"""
 
-    __classes: dict
+    __classes: dict[str, SmaliClass]
     """All inner classes of this class"""
 
-    __super: str
+    __super: SVMType
     """The class descriptor of the super class"""
 
-    __implements: list
+    __implements: list[SVMType]
     """The list of implemented interfaces."""
 
     def __init__(
@@ -617,14 +634,16 @@ class SmaliClass(SmaliMember):
         modifiers: int,
         annotations: list = None,
     ) -> None:
-        super().__init__(parent, signature, modifiers, SmaliClass, annotations)
-        sig_type = Type(signature)
-        self.__name = sig_type.class_name
-        self.__simple_name = self.__name.split(".")[-1]
+        super().__init__(
+            signature, parent, signature, modifiers, SmaliClass, annotations
+        )
+        self.__name = self.type.pretty_name
+        self.__simple_name = self.type.simple_name
         self.__fields = {}
         self.__methods = {}
         self.__super = None
         self.__implements = []
+        self.__classes = {}
 
     @property
     def simple_name(self) -> str:
@@ -637,7 +656,7 @@ class SmaliClass(SmaliMember):
 
     @property
     def name(self) -> str:
-        """Returns the name of this class with the package"""
+        """Returns the name of this class with the package (with dots)"""
         return self.__name
 
     @name.setter
@@ -650,20 +669,20 @@ class SmaliClass(SmaliMember):
         self.__name = value
 
     @property
-    def inner_classes(self) -> dict:
+    def inner_classes(self) -> dict[str, SmaliClass]:
         """Returns all inner classes
 
-        :return: _description_
+        :return: all defined inner classes
         :rtype: dict
         """
         return self.__classes
 
     @property
-    def super_cls(self) -> str:
+    def super_cls(self) -> SVMType:
         """Returns the super class of this class
 
         :return: the super class name
-        :rtype: str
+        :rtype: SVMType | SmaliClass
         """
         return self.__super
 
@@ -677,13 +696,29 @@ class SmaliClass(SmaliMember):
         self.__super = value
 
     @property
-    def interfaces(self) -> list:
+    def interfaces(self) -> list[SVMType]:
         """Returns all implemented interfaces (type descriptors)
 
         :return: all implemented interfacea in a list
         :rtype: list
         """
         return self.__implements
+
+    def get_declared_methods(self, access_type: AccessType = None) -> list[SmaliMethod]:
+        """Returns all declared methods in this class,
+
+        :param access_type: an extra filter, defaults to None
+        :type access_type: AccessType, optional
+        :return: the list of defined smali methods
+        :rtype: list[SmaliMethod]
+        """
+        result = []
+        for name in self.__methods:
+            for method in self.__methods[name]:
+                if access_type is None or method.modifiers in access_type:
+                    result.append(method)
+
+        return result
 
     def method(self, signature: str) -> SmaliMethod:
         """Searches for the given method signature or name.
@@ -701,8 +736,7 @@ class SmaliClass(SmaliMember):
                 return broker
 
             for method in broker:
-                # See __eq__() in SmaliMember
-                if method == signature:
+                if method.signature == signature:
                     return method
 
         raise NoSuchMethodError(f'Method with signature "{signature}" not found')

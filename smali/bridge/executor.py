@@ -1,7 +1,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import struct
 
-from smali import SmaliValue, Type
+from smali import SmaliValue, SVMType
 from smali.opcode import *  # noqa
 from smali.bridge.frame import Frame
 from smali.bridge.errors import ExecutionError
@@ -373,13 +373,14 @@ def new_instance(self: Executor, register: str, descriptor: str):
 
 @opcode_executor()
 def new_array(self: Executor, dest: str, count_register: str, descriptor: str):
-    cls_name = Type(descriptor).class_name
+    cls_type = SVMType(descriptor)
     values = [None] * self.frame[count_register]
-    if cls_name in "BSIJ":  # number
-        values = [0] * self.frame[count_register]
+    if cls_type.svm_type == SVMType.TYPES.PRIMITIVE:
+        if cls_type.simple_name in "BSIJ":  # number
+            values = [0] * self.frame[count_register]
 
-    elif cls_name in "FD":  # floating point
-        values = [0.0] * self.frame[count_register]
+        elif cls_type.simple_name in "FD":  # floating point
+            values = [0.0] * self.frame[count_register]
 
     self.frame[dest] = values
 
