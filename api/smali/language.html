@@ -1,19 +1,19 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Smali Language &mdash; pysmali 0.2.0 documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
   
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+      <script src="../../_static/documentation_options.js?v=938c9ccc"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -32,9 +32,6 @@
           <a href="../../index.html" class="icon icon-home">
             pysmali
           </a>
-              <div class="version">
-                0.1
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -440,7 +437,7 @@
            <div itemprop="articleBody">
              
   <section id="smali-language">
-<span id="id1"></span><h1><a class="toc-backref" href="#id3" role="doc-backlink">Smali Language</a><a class="headerlink" href="#smali-language" title="Permalink to this heading">¶</a></h1>
+<span id="id1"></span><h1><a class="toc-backref" href="#id3" role="doc-backlink">Smali Language</a><a class="headerlink" href="#smali-language" title="Link to this heading">¶</a></h1>
 <p>Smali is an assembly-like language used to write code for Android
 apps. It is designed to be human-readable as well as easy to understand,
 while still being low-level enough to allow for fine-grained control
@@ -468,7 +465,7 @@ to <em>internal names</em>.</p>
 <p>The structure of a Smali source code can be broken down into the following
 sections:</p>
 <section id="class-header">
-<h2><a class="toc-backref" href="#id4" role="doc-backlink">Class Header</a><a class="headerlink" href="#class-header" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Class Header</a><a class="headerlink" href="#class-header" title="Link to this heading">¶</a></h2>
 <p>The header of a Smali file contains several pieces of information that are
 used by the Smali assembler to build the final <code class="docutils literal notranslate"><span class="pre">.dex</span></code> file for an Android
 app. It starts with the <code class="docutils literal notranslate"><span class="pre">.class</span></code> directive, which specifies the name of the
@@ -543,7 +540,7 @@ methods:</p>
 class being defined, as well as optional directives that provide additional information.</p>
 </section>
 <section id="class-annotations">
-<h2><a class="toc-backref" href="#id5" role="doc-backlink">Class Annotations</a><a class="headerlink" href="#class-annotations" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Class Annotations</a><a class="headerlink" href="#class-annotations" title="Link to this heading">¶</a></h2>
 <p>In Smali, class annotations are used to provide metadata information about a class. They
 are defined using the <code class="docutils literal notranslate"><span class="pre">.annotation</span></code> directive followed by their descriptor and elements.
 Here is an example of how class annotations are defined in Smali:</p>
@@ -626,7 +623,7 @@ super classes of the declared class. In this case, there is only one super class
 </div>
 </section>
 <section id="fields">
-<h2><a class="toc-backref" href="#id6" role="doc-backlink">Fields</a><a class="headerlink" href="#fields" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">Fields</a><a class="headerlink" href="#fields" title="Link to this heading">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">.field</span></code> directive in Smali is used to define a field within a class. The general
 syntax for the field directive is as follows:</p>
 <div class="highlight-bnf notranslate"><div class="highlight"><pre><span></span>.field <span class="p">&lt;</span><span class="nc">access_flags</span><span class="p">&gt;</span> <span class="p">&lt;</span><span class="nc">name</span><span class="p">&gt;</span>:<span class="p">&lt;</span><span class="nc">type_descriptor</span><span class="p">&gt;</span> [ = <span class="p">&lt;</span><span class="nc">value</span><span class="p">&gt;</span> ]
@@ -639,10 +636,10 @@ syntax for the field directive is as follows:</p>
 <div><p>Access flags specifiy the access modifiers for the field being defined. It can be
 one of the following values:</p>
 <table class="docutils align-default" id="id2">
-<caption><span class="caption-text">Access flags of the <code class="docutils literal notranslate"><span class="pre">.field</span></code> directive</span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
+<caption><span class="caption-text">Access flags of the <code class="docutils literal notranslate"><span class="pre">.field</span></code> directive</span><a class="headerlink" href="#id2" title="Link to this table">¶</a></caption>
 <colgroup>
-<col style="width: 40%" />
-<col style="width: 60%" />
+<col style="width: 40.0%" />
+<col style="width: 60.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Name</p></th>
@@ -713,7 +710,7 @@ indicates that this field has an integer as its value. This field can only be ac
 within the same class or any non-static sub-class.</p>
 </section>
 <section id="methods">
-<h2><a class="toc-backref" href="#id7" role="doc-backlink">Methods</a><a class="headerlink" href="#methods" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">Methods</a><a class="headerlink" href="#methods" title="Link to this heading">¶</a></h2>
 <p>In Smali, a method definition consists of several components, including access modifiers,
 return type, parameter types, and implementation code. The code block contains the actual
 assembly-like code that is executed when the method is called. It can contain registers,
@@ -841,7 +838,7 @@ into the register <code class="docutils literal notranslate"><span class="pre">v
 </ul>
 </section>
 <section id="annotations">
-<h2><a class="toc-backref" href="#id8" role="doc-backlink">Annotations</a><a class="headerlink" href="#annotations" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id8" role="doc-backlink">Annotations</a><a class="headerlink" href="#annotations" title="Link to this heading">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">.annotation</span></code> directive in Smali is used to define an annotation. The structure of this
 directive is as follows:</p>
 <div class="highlight-bnf notranslate"><div class="highlight"><pre><span></span>.[sub]annotation <span class="p">&lt;</span><span class="nc">visibility</span><span class="p">&gt;</span> <span class="p">&lt;</span><span class="nc">annotation_type</span><span class="p">&gt;</span>

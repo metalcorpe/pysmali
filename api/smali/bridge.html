@@ -1,19 +1,19 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>1. Smali VM &mdash; pysmali 0.2.0 documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
   
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+      <script src="../../_static/documentation_options.js?v=938c9ccc"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -32,9 +32,6 @@
           <a href="../../index.html" class="icon icon-home">
             pysmali
           </a>
-              <div class="version">
-                0.1
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -440,7 +437,7 @@
            <div itemprop="articleBody">
              
   <section id="module-smali.bridge.vm">
-<span id="smali-vm"></span><span id="smali-bridge"></span><h1><span class="section-number">1. </span>Smali VM<a class="headerlink" href="#module-smali.bridge.vm" title="Permalink to this heading">¶</a></h1>
+<span id="smali-vm"></span><span id="smali-bridge"></span><h1><span class="section-number">1. </span>Smali VM<a class="headerlink" href="#module-smali.bridge.vm" title="Link to this heading">¶</a></h1>
 <p>Implementation of a simple Smali emulator named <em>SmaliVM</em>. It supports
 execution of small code snippets as well as the execution of whole
 class files.</p>
@@ -496,11 +493,11 @@ class creation and object initialization is rather simple:</p>
 </div>
 <dl class="py class">
 <dt class="sig sig-object py" id="smali.bridge.vm.SmaliVM">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smali.bridge.vm.</span></span><span class="sig-name descname"><span class="pre">SmaliVM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">class_loader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#smali.bridge.vm.ClassLoader" title="smali.bridge.vm.ClassLoader"><span class="pre">ClassLoader</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">executors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_strict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smali.bridge.vm.SmaliVM" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smali.bridge.vm.</span></span><span class="sig-name descname"><span class="pre">SmaliVM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">class_loader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#smali.bridge.vm.ClassLoader" title="smali.bridge.vm.ClassLoader"><span class="pre">ClassLoader</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">executors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_strict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smali.bridge.vm.SmaliVM" title="Link to this definition">¶</a></dt>
 <dd><p>Basic implementation of a Smali emulator in Python.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="smali.bridge.vm.SmaliVM.__classes">
-<span class="sig-name descname"><span class="pre">__classes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="bridge_api.html#smali.bridge.lang.SmaliClass" title="smali.bridge.lang.SmaliClass"><span class="pre">smali.bridge.lang.SmaliClass</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#smali.bridge.vm.SmaliVM.__classes" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__classes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="bridge_api.html#smali.bridge.lang.SmaliClass" title="smali.bridge.lang.SmaliClass"><span class="pre">SmaliClass</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#smali.bridge.vm.SmaliVM.__classes" title="Link to this definition">¶</a></dt>
 <dd><p>All classes are stored in a dict</p>
 <dl class="field-list simple">
 </dl>
@@ -508,7 +505,7 @@ class creation and object initialization is rather simple:</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="smali.bridge.vm.SmaliVM.__frames">
-<span class="sig-name descname"><span class="pre">__frames</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="bridge_api.html#smali.bridge.frame.Frame" title="smali.bridge.frame.Frame"><span class="pre">smali.bridge.frame.Frame</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#smali.bridge.vm.SmaliVM.__frames" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__frames</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="bridge_api.html#smali.bridge.frame.Frame" title="smali.bridge.frame.Frame"><span class="pre">Frame</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#smali.bridge.vm.SmaliVM.__frames" title="Link to this definition">¶</a></dt>
 <dd><p>Stores all execution frames mapped to their method object</p>
 <dl class="field-list simple">
 </dl>
@@ -516,7 +513,7 @@ class creation and object initialization is rather simple:</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="smali.bridge.vm.SmaliVM.call">
-<span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="bridge_api.html#smali.bridge.lang.SmaliMethod" title="smali.bridge.lang.SmaliMethod"><span class="pre">SmaliMethod</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">object</span></span></span><a class="headerlink" href="#smali.bridge.vm.SmaliVM.call" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="bridge_api.html#smali.bridge.lang.SmaliMethod" title="smali.bridge.lang.SmaliMethod"><span class="pre">SmaliMethod</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">object</span></span></span><a class="headerlink" href="#smali.bridge.vm.SmaliVM.call" title="Link to this definition">¶</a></dt>
 <dd><p>Executes the given method in the given object instance.</p>
 <p>Before the method will be executed, there is an input parameter
 check to validate all passed arguments. The required registers
@@ -547,25 +544,25 @@ in this object.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="smali.bridge.vm.SmaliVM.classloader">
-<span class="sig-name descname"><span class="pre">classloader</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#smali.bridge.vm.ClassLoader" title="smali.bridge.vm.ClassLoader"><span class="pre">ClassLoader</span></a></em><a class="headerlink" href="#smali.bridge.vm.SmaliVM.classloader" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">classloader</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#smali.bridge.vm.ClassLoader" title="smali.bridge.vm.ClassLoader"><span class="pre">ClassLoader</span></a></em><a class="headerlink" href="#smali.bridge.vm.SmaliVM.classloader" title="Link to this definition">¶</a></dt>
 <dd><p>The class loader used to define classes.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="smali.bridge.vm.SmaliVM.debug_handler">
-<span class="sig-name descname"><span class="pre">debug_handler</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">DebugHandler</span></em><a class="headerlink" href="#smali.bridge.vm.SmaliVM.debug_handler" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">debug_handler</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">DebugHandler</span></em><a class="headerlink" href="#smali.bridge.vm.SmaliVM.debug_handler" title="Link to this definition">¶</a></dt>
 <dd><p>The debug handler to use.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="smali.bridge.vm.SmaliVM.executors">
-<span class="sig-name descname"><span class="pre">executors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">smali.bridge.executor.Executor</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#smali.bridge.vm.SmaliVM.executors" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">executors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Executor</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#smali.bridge.vm.SmaliVM.executors" title="Link to this definition">¶</a></dt>
 <dd><p>External executors used to operate on a single opcode.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="smali.bridge.vm.SmaliVM.get_class">
-<span class="sig-name descname"><span class="pre">get_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="bridge_api.html#smali.bridge.lang.SmaliClass" title="smali.bridge.lang.SmaliClass"><span class="pre">SmaliClass</span></a></span></span><a class="headerlink" href="#smali.bridge.vm.SmaliVM.get_class" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="bridge_api.html#smali.bridge.lang.SmaliClass" title="smali.bridge.lang.SmaliClass"><span class="pre">SmaliClass</span></a></span></span><a class="headerlink" href="#smali.bridge.vm.SmaliVM.get_class" title="Link to this definition">¶</a></dt>
 <dd><p>Searches for a class with the given name.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -585,7 +582,7 @@ in this object.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="smali.bridge.vm.SmaliVM.new_class">
-<span class="sig-name descname"><span class="pre">new_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_SmaliVM__class</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="bridge_api.html#smali.bridge.lang.SmaliClass" title="smali.bridge.lang.SmaliClass"><span class="pre">SmaliClass</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smali.bridge.vm.SmaliVM.new_class" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">new_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_SmaliVM__class</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="bridge_api.html#smali.bridge.lang.SmaliClass" title="smali.bridge.lang.SmaliClass"><span class="pre">SmaliClass</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smali.bridge.vm.SmaliVM.new_class" title="Link to this definition">¶</a></dt>
 <dd><p>Defines a new class that can be accessed globally.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -596,7 +593,7 @@ in this object.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="smali.bridge.vm.SmaliVM.new_frame">
-<span class="sig-name descname"><span class="pre">new_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="bridge_api.html#smali.bridge.lang.SmaliMethod" title="smali.bridge.lang.SmaliMethod"><span class="pre">SmaliMethod</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="bridge_api.html#smali.bridge.frame.Frame" title="smali.bridge.frame.Frame"><span class="pre">Frame</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smali.bridge.vm.SmaliVM.new_frame" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">new_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="bridge_api.html#smali.bridge.lang.SmaliMethod" title="smali.bridge.lang.SmaliMethod"><span class="pre">SmaliMethod</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="bridge_api.html#smali.bridge.frame.Frame" title="smali.bridge.frame.Frame"><span class="pre">Frame</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smali.bridge.vm.SmaliVM.new_frame" title="Link to this definition">¶</a></dt>
 <dd><p>Creates a new method frame that will be mapped to the method’s signature-</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -610,7 +607,7 @@ in this object.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="smali.bridge.vm.SmaliVM.use_strict">
-<span class="sig-name descname"><span class="pre">use_strict</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#smali.bridge.vm.SmaliVM.use_strict" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">use_strict</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#smali.bridge.vm.SmaliVM.use_strict" title="Link to this definition">¶</a></dt>
 <dd><p>Tells the VM to throw exceptions on unkown opcodes.</p>
 </dd></dl>
 
@@ -618,11 +615,11 @@ in this object.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="smali.bridge.vm.ClassLoader">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smali.bridge.vm.</span></span><span class="sig-name descname"><span class="pre">ClassLoader</span></span><a class="headerlink" href="#smali.bridge.vm.ClassLoader" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smali.bridge.vm.</span></span><span class="sig-name descname"><span class="pre">ClassLoader</span></span><a class="headerlink" href="#smali.bridge.vm.ClassLoader" title="Link to this definition">¶</a></dt>
 <dd><p>Abstract base class for SmaliClassLoader</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="smali.bridge.vm.ClassLoader.define_class">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">define_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">IOBase</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="bridge_api.html#smali.bridge.lang.SmaliClass" title="smali.bridge.lang.SmaliClass"><span class="pre">SmaliClass</span></a></span></span><a class="headerlink" href="#smali.bridge.vm.ClassLoader.define_class" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">define_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">IOBase</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="bridge_api.html#smali.bridge.lang.SmaliClass" title="smali.bridge.lang.SmaliClass"><span class="pre">SmaliClass</span></a></span></span><a class="headerlink" href="#smali.bridge.vm.ClassLoader.define_class" title="Link to this definition">¶</a></dt>
 <dd><p>Defines a new SmaliClass by parsing the given source file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -639,7 +636,7 @@ in this object.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="smali.bridge.vm.ClassLoader.load_class">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">IOBase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lookup_missing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="bridge_api.html#smali.bridge.lang.SmaliClass" title="smali.bridge.lang.SmaliClass"><span class="pre">SmaliClass</span></a></span></span><a class="headerlink" href="#smali.bridge.vm.ClassLoader.load_class" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">IOBase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lookup_missing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="bridge_api.html#smali.bridge.lang.SmaliClass" title="smali.bridge.lang.SmaliClass"><span class="pre">SmaliClass</span></a></span></span><a class="headerlink" href="#smali.bridge.vm.ClassLoader.load_class" title="Link to this definition">¶</a></dt>
 <dd><p>Parses the given source code and initializes the given class if enabled.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

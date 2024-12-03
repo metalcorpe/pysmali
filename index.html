@@ -1,19 +1,19 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PySmali’s documentation &mdash; pysmali 0.2.0 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+      <script src="_static/documentation_options.js?v=938c9ccc"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -31,9 +31,6 @@
           <a href="#" class="icon icon-home">
             pysmali
           </a>
-              <div class="version">
-                0.1
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -439,14 +436,14 @@
            <div itemprop="articleBody">
              
   <section id="pysmali-s-documentation">
-<h1>PySmali’s documentation<a class="headerlink" href="#pysmali-s-documentation" title="Permalink to this heading">¶</a></h1>
+<h1>PySmali’s documentation<a class="headerlink" href="#pysmali-s-documentation" title="Link to this heading">¶</a></h1>
 <p>Welcome to the documentation for <cite>pysmali</cite>, a Python3 package designed for parsing,
 transforming and generating Smali source code files, as well as interpreting source
 code files. This documentation is intended to provide an overview of the package’s
 features, installation instructions, and usage examples to help you get started with
 using the package in your Python projects.</p>
 <section id="using-this-library">
-<h2>Using this library<a class="headerlink" href="#using-this-library" title="Permalink to this heading">¶</a></h2>
+<h2>Using this library<a class="headerlink" href="#using-this-library" title="Link to this heading">¶</a></h2>
 <dl class="simple">
 <dt><a class="reference internal" href="installation.html"><span class="doc">Installation</span></a></dt><dd><p>How to install the python package locally or in a virtal environment.</p>
 </dd>
@@ -459,9 +456,9 @@ using the package in your Python projects.</p>
 </dl>
 </section>
 <section id="examples">
-<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this heading">¶</a></h2>
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h2>
 <div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">Reading Smali code</span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text">Reading Smali code</span><a class="headerlink" href="#id1" title="Link to this code">¶</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">from</span> <span class="nn">smali</span> <span class="kn">import</span> <span class="n">SmaliReader</span><span class="p">,</span> <span class="n">SmaliWriter</span>
 <span class="linenos"> 2</span>
 <span class="linenos"> 3</span><span class="n">reader</span> <span class="o">=</span> <span class="n">SmaliReader</span><span class="p">(</span><span class="n">comments</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -479,7 +476,7 @@ using the package in your Python projects.</p>
 </div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">Modifying Smali code</span><a class="headerlink" href="#id2" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text">Modifying Smali code</span><a class="headerlink" href="#id2" title="Link to this code">¶</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">from</span> <span class="nn">smali</span> <span class="kn">import</span> <span class="n">SmaliWriter</span><span class="p">,</span> <span class="n">AccessType</span>
 <span class="linenos"> 2</span>
 <span class="linenos"> 3</span><span class="n">writer</span> <span class="o">=</span> <span class="n">SmaliWriter</span><span class="p">()</span>
@@ -504,7 +501,7 @@ using the package in your Python projects.</p>
 </div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text">Execute Smali code</span><a class="headerlink" href="#id3" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text">Execute Smali code</span><a class="headerlink" href="#id3" title="Link to this code">¶</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">from</span> <span class="nn">smali.bridge</span> <span class="kn">import</span> <span class="n">SmaliClass</span><span class="p">,</span> <span class="n">SmaliObject</span><span class="p">,</span> <span class="n">SmaliVM</span>
 <span class="linenos"> 2</span>
 <span class="linenos"> 3</span><span class="c1"># Let&#39;s assume, the class&#39; source code is stored here</span>
@@ -548,7 +545,7 @@ installation of this module:</p>
 </div>
 </section>
 <section id="development">
-<h2>Development<a class="headerlink" href="#development" title="Permalink to this heading">¶</a></h2>
+<h2>Development<a class="headerlink" href="#development" title="Link to this heading">¶</a></h2>
 <dl class="simple">
 <dt><a class="reference internal" href="contributing.html"><span class="doc">Contributing</span></a></dt><dd><p>How to contribute changes to the project.</p>
 </dd>
@@ -566,7 +563,7 @@ installation of this module:</p>
 </section>
 </section>
 <section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading">¶</a></h1>
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading">¶</a></h1>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>

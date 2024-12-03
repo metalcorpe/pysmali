@@ -1,19 +1,19 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>3. Smali Shell (ISmali) &mdash; pysmali 0.2.0 documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
   
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+      <script src="../../_static/documentation_options.js?v=938c9ccc"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -31,9 +31,6 @@
           <a href="../../index.html" class="icon icon-home">
             pysmali
           </a>
-              <div class="version">
-                0.1
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -439,7 +436,7 @@
            <div itemprop="articleBody">
              
   <section id="smali-shell-ismali">
-<span id="smali-shell"></span><h1><span class="section-number">3. </span>Smali Shell (ISmali)<a class="headerlink" href="#smali-shell-ismali" title="Permalink to this heading">¶</a></h1>
+<span id="smali-shell"></span><h1><span class="section-number">3. </span>Smali Shell (ISmali)<a class="headerlink" href="#smali-shell-ismali" title="Link to this heading">¶</a></h1>
 <p>Introducing a new file format that combines the simplicity of shell scripts with the power of Smali-Code
 in version <a class="reference internal" href="../../changelog.html#release-0-1-1"><span class="std std-ref">0.1.1</span></a> of this project. This new format, which will be called Smali-Script is
 defined by the file suffix <code class="docutils literal notranslate"><span class="pre">&quot;.ssf&quot;</span></code>. It is designed to allow users to create and run Smali-Code directly
@@ -467,7 +464,7 @@ types can be created after importing the class. All instructions will be execute
 fields will be stored in the root class named <code class="docutils literal notranslate"><span class="pre">L&lt;Root&gt;;</span></code>.</p>
 </div>
 <section id="define-smali-fields">
-<h2><span class="section-number">3.1. </span>Define Smali-Fields<a class="headerlink" href="#define-smali-fields" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">3.1. </span>Define Smali-Fields<a class="headerlink" href="#define-smali-fields" title="Link to this heading">¶</a></h2>
 <p>Fields can be defined rather easily. By now, only one-liner are accepted:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>&gt;&gt;&gt;<span class="w"> </span>.field<span class="w"> </span>public<span class="w"> </span>static<span class="w"> </span>abc:Ljava/lang/String<span class="p">;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Hello, World!&quot;</span>
 <span class="linenos">2</span>&gt;&gt;&gt;<span class="w"> </span><span class="c1"># Retrieve the value via sget on static fields</span>
@@ -482,7 +479,7 @@ the name can be customized). Because we moved abc’s value into a register, we 
 value by typing <code class="docutils literal notranslate"><span class="pre">vars</span></code>.</p>
 </section>
 <section id="execute-smali-methods">
-<h2><span class="section-number">3.2. </span>Execute Smali-Methods<a class="headerlink" href="#execute-smali-methods" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">3.2. </span>Execute Smali-Methods<a class="headerlink" href="#execute-smali-methods" title="Link to this heading">¶</a></h2>
 <p>The next example illustrates how to simply invoke a method within the interpreter.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -500,7 +497,7 @@ is proposed to be released in the next version.</p>
 register stores the actual instance and the second (<code class="docutils literal notranslate"><span class="pre">v0</span></code>) a string representation of it.</p>
 </section>
 <section id="module-smali.shell">
-<span id="shell-components"></span><h2><span class="section-number">3.3. </span>Shell Components<a class="headerlink" href="#module-smali.shell" title="Permalink to this heading">¶</a></h2>
+<span id="shell-components"></span><h2><span class="section-number">3.3. </span>Shell Components<a class="headerlink" href="#module-smali.shell" title="Link to this heading">¶</a></h2>
 <p>Implementation of a “shell”-like interpreter that can be run interactively
 or can execute smali files.</p>
 <p>The options the <code class="docutils literal notranslate"><span class="pre">smali.shell</span></code> module accept are the following:</p>
@@ -514,35 +511,35 @@ the interactive mode afterwards.</p>
 </dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="smali.shell.ISmaliShell">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smali.shell.</span></span><span class="sig-name descname"><span class="pre">ISmaliShell</span></span><a class="headerlink" href="#smali.shell.ISmaliShell" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smali.shell.</span></span><span class="sig-name descname"><span class="pre">ISmaliShell</span></span><a class="headerlink" href="#smali.shell.ISmaliShell" title="Link to this definition">¶</a></dt>
 <dd><p>Implementation of an interactive Smali-Interpreter.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="smali.shell.ISmaliShell.DEFAULT_PROMPT">
-<span class="sig-name descname"><span class="pre">DEFAULT_PROMPT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'&gt;&gt;&gt;</span> <span class="pre">'</span></em><a class="headerlink" href="#smali.shell.ISmaliShell.DEFAULT_PROMPT" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">DEFAULT_PROMPT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'&gt;&gt;&gt;</span> <span class="pre">'</span></em><a class="headerlink" href="#smali.shell.ISmaliShell.DEFAULT_PROMPT" title="Link to this definition">¶</a></dt>
 <dd><p>The default prompt</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="smali.shell.ISmaliShell.INLINE_PROMPT">
-<span class="sig-name descname"><span class="pre">INLINE_PROMPT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'...</span> <span class="pre">'</span></em><a class="headerlink" href="#smali.shell.ISmaliShell.INLINE_PROMPT" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">INLINE_PROMPT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'...</span> <span class="pre">'</span></em><a class="headerlink" href="#smali.shell.ISmaliShell.INLINE_PROMPT" title="Link to this definition">¶</a></dt>
 <dd><p>Prompt used for field and method definitions</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="smali.shell.ISmaliShell.change_prompt">
-<span class="sig-name descname"><span class="pre">change_prompt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smali.shell.ISmaliShell.change_prompt" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">change_prompt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smali.shell.ISmaliShell.change_prompt" title="Link to this definition">¶</a></dt>
 <dd><p>Changes the prompt (for later usage)</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="smali.shell.ISmaliShell.check_import">
-<span class="sig-name descname"><span class="pre">check_import</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#smali.shell.ISmaliShell.check_import" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">check_import</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#smali.shell.ISmaliShell.check_import" title="Link to this definition">¶</a></dt>
 <dd><p>Used to indicate whether this shell should verify each import</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="smali.shell.ISmaliShell.default">
-<span class="sig-name descname"><span class="pre">default</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#smali.shell.ISmaliShell.default" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">default</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#smali.shell.ISmaliShell.default" title="Link to this definition">¶</a></dt>
 <dd><p>Handles the instruction or register name</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -553,13 +550,13 @@ the interactive mode afterwards.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="smali.shell.ISmaliShell.do_copyright">
-<span class="sig-name descname"><span class="pre">do_copyright</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smali.shell.ISmaliShell.do_copyright" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">do_copyright</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smali.shell.ISmaliShell.do_copyright" title="Link to this definition">¶</a></dt>
 <dd><p>Prints copyright information</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="smali.shell.ISmaliShell.do_del">
-<span class="sig-name descname"><span class="pre">do_del</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">register</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smali.shell.ISmaliShell.do_del" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">do_del</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">register</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smali.shell.ISmaliShell.do_del" title="Link to this definition">¶</a></dt>
 <dd><p>usage: del &lt;register&gt;</p>
 <p>Deletes the variable at the specified register. The root
 context at ‘p0’ can’t be deleted.</p>
@@ -567,20 +564,20 @@ context at ‘p0’ can’t be deleted.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="smali.shell.ISmaliShell.do_exit">
-<span class="sig-name descname"><span class="pre">do_exit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smali.shell.ISmaliShell.do_exit" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">do_exit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smali.shell.ISmaliShell.do_exit" title="Link to this definition">¶</a></dt>
 <dd><p>Exits the interpreter</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="smali.shell.ISmaliShell.do_fields">
-<span class="sig-name descname"><span class="pre">do_fields</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smali.shell.ISmaliShell.do_fields" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">do_fields</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smali.shell.ISmaliShell.do_fields" title="Link to this definition">¶</a></dt>
 <dd><p>usage: fields</p>
 <p>Prints all fields that have been defined in the root context.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="smali.shell.ISmaliShell.do_import">
-<span class="sig-name descname"><span class="pre">do_import</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#smali.shell.ISmaliShell.do_import" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">do_import</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#smali.shell.ISmaliShell.do_import" title="Link to this definition">¶</a></dt>
 <dd><p>usage: import &lt;file&gt;</p>
 <p>This command will try to import the given smali file or
 Smali-Script file (.ssf). Note that files with wrong suffixes
@@ -589,52 +586,52 @@ will be ignored.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="smali.shell.ISmaliShell.do_label">
-<span class="sig-name descname"><span class="pre">do_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smali.shell.ISmaliShell.do_label" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">do_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smali.shell.ISmaliShell.do_label" title="Link to this definition">¶</a></dt>
 <dd><p>:usage label</p>
 <p>Prints the name of the active label.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="smali.shell.ISmaliShell.do_vars">
-<span class="sig-name descname"><span class="pre">do_vars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smali.shell.ISmaliShell.do_vars" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">do_vars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smali.shell.ISmaliShell.do_vars" title="Link to this definition">¶</a></dt>
 <dd><p>usage: vars</p>
 <p>Prints all variables with the help of <code class="docutils literal notranslate"><span class="pre">pprint</span></code>.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="smali.shell.ISmaliShell.emulator">
-<span class="sig-name descname"><span class="pre">emulator</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="bridge.html#smali.bridge.vm.SmaliVM" title="smali.bridge.vm.SmaliVM"><span class="pre">SmaliVM</span></a></em><a class="headerlink" href="#smali.shell.ISmaliShell.emulator" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">emulator</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="bridge.html#smali.bridge.vm.SmaliVM" title="smali.bridge.vm.SmaliVM"><span class="pre">SmaliVM</span></a></em><a class="headerlink" href="#smali.shell.ISmaliShell.emulator" title="Link to this definition">¶</a></dt>
 <dd><p>The actual VM reference that will execute each method</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="smali.shell.ISmaliShell.precmd">
-<span class="sig-name descname"><span class="pre">precmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smali.shell.ISmaliShell.precmd" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">precmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smali.shell.ISmaliShell.precmd" title="Link to this definition">¶</a></dt>
 <dd><p>Hook method executed just before the command line is
 interpreted, but after the input prompt is generated and issued.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="smali.shell.ISmaliShell.prompt">
-<span class="sig-name descname"><span class="pre">prompt</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'&gt;&gt;&gt;</span> <span class="pre">'</span></em><a class="headerlink" href="#smali.shell.ISmaliShell.prompt" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">prompt</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'&gt;&gt;&gt;</span> <span class="pre">'</span></em><a class="headerlink" href="#smali.shell.ISmaliShell.prompt" title="Link to this definition">¶</a></dt>
 <dd><p>The prompt used by <code class="docutils literal notranslate"><span class="pre">cmd.Cmd</span></code></p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="smali.shell.ISmaliShell.reader">
-<span class="sig-name descname"><span class="pre">reader</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="reader.html#smali.reader.SmaliReader" title="smali.reader.SmaliReader"><span class="pre">SmaliReader</span></a></em><a class="headerlink" href="#smali.shell.ISmaliShell.reader" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">reader</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="reader.html#smali.reader.SmaliReader" title="smali.reader.SmaliReader"><span class="pre">SmaliReader</span></a></em><a class="headerlink" href="#smali.shell.ISmaliShell.reader" title="Link to this definition">¶</a></dt>
 <dd><p>The reader used to parse code snippets.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="smali.shell.ISmaliShell.root">
-<span class="sig-name descname"><span class="pre">root</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="bridge_api.html#smali.bridge.lang.SmaliObject" title="smali.bridge.lang.SmaliObject"><span class="pre">SmaliObject</span></a></em><a class="headerlink" href="#smali.shell.ISmaliShell.root" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">root</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="bridge_api.html#smali.bridge.lang.SmaliObject" title="smali.bridge.lang.SmaliObject"><span class="pre">SmaliObject</span></a></em><a class="headerlink" href="#smali.shell.ISmaliShell.root" title="Link to this definition">¶</a></dt>
 <dd><p>The base context used to define fields and methods.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="smali.shell.ISmaliShell.visitor">
-<span class="sig-name descname"><span class="pre">visitor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">DefaultVisitor</span></em><a class="headerlink" href="#smali.shell.ISmaliShell.visitor" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">visitor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">DefaultVisitor</span></em><a class="headerlink" href="#smali.shell.ISmaliShell.visitor" title="Link to this definition">¶</a></dt>
 <dd><p>The default visitor instance</p>
 </dd></dl>
 
